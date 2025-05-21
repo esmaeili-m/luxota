@@ -1,0 +1,161 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "My Laravel Modular API",
+        "description": "This is the Swagger documentation for the Laravel Modular API project.",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://my-default-host.com",
+            "description": "Main API Server"
+        }
+    ],
+    "paths": {
+        "/api/v1/users": {
+            "get": {
+                "tags": [
+                    "Users1"
+                ],
+                "summary": "Get user list",
+                "description": "Returns list of all users",
+                "operationId": "416e60cb1e5c5f75b34ccf2bc3c320be",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/User"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "User": {
+                "required": [
+                    "id",
+                    "name",
+                    "email",
+                    "phone",
+                    "password"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "john@example.com"
+                    },
+                    "phone": {
+                        "type": "string",
+                        "example": "+989123456789"
+                    },
+                    "password": {
+                        "type": "string",
+                        "format": "password",
+                        "example": "secret123"
+                    },
+                    "role_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "zone_id": {
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "توضیحات اضافی کاربر",
+                        "nullable": true
+                    },
+                    "city_id": {
+                        "type": "integer",
+                        "example": 112
+                    },
+                    "avatar": {
+                        "type": "string",
+                        "example": "https://example.com/avatar.jpg",
+                        "nullable": true
+                    },
+                    "website": {
+                        "type": "object",
+                        "example": {
+                            "en": "https://site.com",
+                            "fa": "https://site.ir"
+                        },
+                        "nullable": true
+                    },
+                    "remember_token": {
+                        "type": "string",
+                        "example": "1|some-token-here",
+                        "nullable": true
+                    },
+                    "address": {
+                        "type": "string",
+                        "example": "تهران، ایران",
+                        "nullable": true
+                    },
+                    "rank_id": {
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "referrer_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "branche_id": {
+                        "type": "integer",
+                        "example": 3
+                    },
+                    "luxota_website": {
+                        "type": "string",
+                        "example": "https://luxota.ir",
+                        "nullable": true
+                    },
+                    "parent_id": {
+                        "type": "integer",
+                        "example": 5,
+                        "nullable": true
+                    },
+                    "status": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "country_code": {
+                        "type": "string",
+                        "example": "+98",
+                        "nullable": true
+                    },
+                    "whatsapp_number": {
+                        "type": "string",
+                        "example": "9123456789",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Users1",
+            "description": "Users1"
+        }
+    ]
+}
