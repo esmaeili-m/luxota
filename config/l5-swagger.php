@@ -46,9 +46,7 @@ return [
                 'docs' => storage_path('api-docs'),
                 'annotations' => [
                     base_path('Modules'),
-//                    base_path('Modules/User/App/Http/Controllers'),
-//                    base_path('Modules/User/App/Models'),
-//                    base_path('Modules/User/App/Swagger'),
+
                 ],
             ],
         ],
@@ -316,7 +314,7 @@ return [
          * Constants which can be used in annotations
          */
         'constants' => [
-            'L5_SWAGGER_CONST_HOST' => env('L5_SWAGGER_CONST_HOST', 'http://my-default-host.com'),
+            'L5_SWAGGER_CONST_HOST' => env('APP_URL', 'http://my-default-host.com'),
         ],
     ],
 ];
