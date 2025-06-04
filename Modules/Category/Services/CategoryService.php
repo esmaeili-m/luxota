@@ -13,6 +13,11 @@ class CategoryService
     $this->repo = $repo;
     }
 
+    public function getPaginated(int $perPage = 15): \Illuminate\Pagination\LengthAwarePaginator
+    {
+        return $this->repo->paginate($perPage);
+    }
+
     public function getAll(): \Illuminate\Database\Eloquent\Collection
     {
     return $this->repo->all();

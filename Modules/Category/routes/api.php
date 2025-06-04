@@ -21,7 +21,6 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->name('api.')->group(function 
 Route::prefix('v1')
     ->name('api.v1.')
     ->group(function () {
-        Route::apiResource('categories', CategoryController::class)
-            ->names('categories');
-
+        Route::get('/categories/all', [CategoryController::class, 'all'])->name('categories.all');
+        Route::apiResource('categories', CategoryController::class)->names('categories');
     });
