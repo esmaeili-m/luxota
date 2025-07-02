@@ -8,5 +8,6 @@
     "Rank": true,
     "Branch": true,
     "Category": true,
-    "Permission": true
+    "Permission": true,
+    "Product": true
 }
