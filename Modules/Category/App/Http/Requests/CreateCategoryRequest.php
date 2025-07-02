@@ -9,14 +9,14 @@ class CreateCategoryRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'title' => 'required|array|min:1',
             'title.*' => 'string|max:255',
             'subtitle.*' => 'string|max:500',
             'subtitle' => [
-                'nullable',
+                'required',
                 'array',
                 function ($attribute, $value, $fail) {
                     if (!is_array($value)) return;
@@ -41,7 +41,7 @@ class CreateCategoryRequest extends FormRequest
                     }
                 },
             ],
-            'slug' => 'required|string|alpha_dash|max:255|unique:categories,slug',
+            'slug' => 'required|string|alpha_dash|max:255|unique:categories,slug,'.$this->route('category'),
             'image' => 'nullable|file|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'parent_id' => 'nullable|exists:categories,id',
         ];
@@ -64,14 +64,12 @@ class CreateCategoryRequest extends FormRequest
     }
     protected function prepareForValidation()
     {
-        // چک کن slug وجود داشته باشه
         if ($this->has('slug')) {
+
             $slug = $this->input('slug');
 
-            // جایگزینی فاصله با خط زیر
             $cleanedSlug = str_replace(' ', '_', $slug);
 
-            // ذخیره مقدار تمیز شده برای استفاده توی ولیدیشن
             $this->merge([
                 'slug' => $cleanedSlug
             ]);

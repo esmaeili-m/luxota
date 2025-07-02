@@ -14,8 +14,11 @@ class CategoryCollection extends ResourceCollection
         return $this->collection->map(function ($item) {
             return [
                 'id' => $item->id,
-                'name' => $item->name,
+                'title'    => $item->title,
+                'subtitle' => $item->subtitle,
                 'slug' => $item->slug,
+                'status' => $item->status,
+                'status_label' => $item->status == 1 ? 'active' : 'inactive',
                 'created_at' => $item->created_at,
             ];
         });
