@@ -11,25 +11,28 @@ class CategoryRepository
     }
     public function paginate(int $perPage = 15): LengthAwarePaginator
     {
-        return Category::paginate($perPage);
+        return Category::whereNull('parent_id')->paginate($perPage);
     }
+
     public function find(int $id, array $with = [])
     {
         return Category::with($with)->findOrFail($id);
     }
+
     public function create(array $data)
     {
         return Category::create($data);
     }
+
     public function update(Category $category, array $data): bool
     {
         return $category->update($data);
     }
+
     public function delete(Category $category): bool
     {
         return $category->delete();
     }
-
 
     public function searchByFields(array $filters)
     {
@@ -60,5 +63,6 @@ class CategoryRepository
 
         return $query->get();
     }
+
 
 }

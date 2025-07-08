@@ -3,6 +3,7 @@
 namespace Modules\Category\Services;
 
 use App\Services\Uploader;
+use Illuminate\Support\Str;
 use Modules\Category\App\Models\Category;
 use Modules\Category\Repositories\CategoryRepository;
 
@@ -33,6 +34,9 @@ class CategoryService
     {
         if (isset($data['image'])) {
             $data['image'] = Uploader::uploadImage($data['image'], 'categories');
+        }
+        if (empty($data['slug'])) {
+            $data['slug'] = Str::slug($data['title']['en']);
         }
         return $this->repo->create($data);
     }
@@ -69,6 +73,13 @@ class CategoryService
     public function searchByFields(array $filters): \Illuminate\Database\Eloquent\Collection|array
     {
         return $this->repo->searchByFields($filters);
+    }
+
+    public function toggle_status($id)
+    {
+        $category = $this->repo->find($id);
+        $newStatus = !$category->status;
+        return $this->repo->update($category, ['status' => $newStatus]);
     }
 
 }

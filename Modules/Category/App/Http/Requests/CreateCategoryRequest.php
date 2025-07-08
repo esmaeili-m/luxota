@@ -12,12 +12,11 @@ class CreateCategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required|array|min:1',
+            'title' => 'required|min:1',
             'title.*' => 'string|max:255',
             'subtitle.*' => 'string|max:500',
             'subtitle' => [
                 'required',
-                'array',
                 function ($attribute, $value, $fail) {
                     if (!is_array($value)) return;
                     $titleArray = $this->input('title');
@@ -41,7 +40,6 @@ class CreateCategoryRequest extends FormRequest
                     }
                 },
             ],
-            'slug' => 'required|string|alpha_dash|max:255|unique:categories,slug,'.$this->route('category'),
             'image' => 'nullable|file|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'parent_id' => 'nullable|exists:categories,id',
         ];
@@ -55,25 +53,9 @@ class CreateCategoryRequest extends FormRequest
             'title.*.string' => 'Each title must be a valid string.',
             'subtitle.array' => 'Subtitle must be an array.',
             'subtitle.*.string' => 'Each subtitle must be a valid string.',
-            'slug.required' => 'The slug is required.',
-            'slug.unique' => 'This slug has already been taken.',
-            'slug.alpha_dash' => 'The slug must only contain letters, numbers, dashes and underscores.',
             'image' => 'nullable|file|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'parent_id.exists' => 'The selected parent category does not exist.',
         ];
-    }
-    protected function prepareForValidation()
-    {
-        if ($this->has('slug')) {
-
-            $slug = $this->input('slug');
-
-            $cleanedSlug = str_replace(' ', '_', $slug);
-
-            $this->merge([
-                'slug' => $cleanedSlug
-            ]);
-        }
     }
 
     /**

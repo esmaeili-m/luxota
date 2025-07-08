@@ -468,5 +468,10 @@ class CategoryController extends Controller
         );
     }
 
+    public function toggle_status($id)
+    {
+        $category = $this->service->toggle_status($id);
+        return response()->json(['message' => 'Change Status successfully']);
 
+    }
 }
