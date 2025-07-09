@@ -9,6 +9,10 @@ class CategoryRepository
     {
         return Category::all();
     }
+    public function getTrashedCategories(): \Illuminate\Database\Eloquent\Collection
+    {
+        return Category::onlyTrashed()->whereNull('parent_id')->get();
+    }
     public function paginate(int $perPage = 15): LengthAwarePaginator
     {
         return Category::whereNull('parent_id')->paginate($perPage);
@@ -32,6 +36,17 @@ class CategoryRepository
     public function delete(Category $category): bool
     {
         return $category->delete();
+    }
+
+    public function restore(Category $category)
+    {
+        return $category->restore();
+
+    }
+    public function forceDelete($id)
+    {
+        $category = Category::onlyTrashed()->findOrFail($id);
+        $category->forceDelete();
     }
 
     public function searchByFields(array $filters)

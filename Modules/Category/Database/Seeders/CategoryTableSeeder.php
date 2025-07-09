@@ -23,7 +23,7 @@ class CategoryTableSeeder extends Seeder
         $headers = fgetcsv($file, 1000, ',');
 
         $categories = [];
-
+        $counter=1;
         while (($row = fgetcsv($file, 1000, ',')) !== false) {
             $data = array_combine($headers, $row);
             $title_data  =json_decode($data['title']);
@@ -61,11 +61,13 @@ class CategoryTableSeeder extends Seeder
                 'subtitle' => json_encode($subtitle),
                 'slug' => $data['slug'],
                 'image' => $data['image'] ?? '',
-                'status' => $status,
+                'status' => 1,
+                'order' => $counter,
                 'parent_id' => $parentId,
                 'created_at' => Carbon::parse($createdAt),
                 'updated_at' => Carbon::parse($updatedAt),
             ];
+            $counter++;
         }
 
         fclose($file);

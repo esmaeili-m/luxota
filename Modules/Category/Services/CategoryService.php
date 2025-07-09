@@ -25,6 +25,10 @@ class CategoryService
     {
         return $this->repo->all();
     }
+    public function getTrashedCategories(): \Illuminate\Database\Eloquent\Collection
+    {
+        return $this->repo->getTrashedCategories();
+    }
 
     public function getById(int $id, array $with = [])
     {
@@ -69,12 +73,26 @@ class CategoryService
         }
         return $category->delete();
     }
+    public function destroy($id)
+    {
+        $this->service->deleteCategory($id);
 
+        return response()->json(['message' => 'Category soft deleted successfully']);
+    }
     public function searchByFields(array $filters): \Illuminate\Database\Eloquent\Collection|array
     {
         return $this->repo->searchByFields($filters);
     }
 
+    public function restore($id)
+    {
+        $category = $this->repo->find($id);
+        $this->repo->restore($category);
+    }
+    public function forceDeleteCategory($id)
+    {
+        $this->repo->forceDelete($id);
+    }
     public function toggle_status($id)
     {
         $category = $this->repo->find($id);

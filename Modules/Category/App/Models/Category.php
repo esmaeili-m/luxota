@@ -24,5 +24,18 @@ class Category extends Model
     {
         return $this->belongsTo(Category::class, 'parent_id');
     }
+    protected static function booted()
+    {
+        static::deleting(function ($category) {
+            if ($category->isForceDeleting()) {
+                $category->children()->forceDelete();
+            } else {
+                $category->children()->delete();
+            }
+        });
 
+        static::restoring(function ($category) {
+            $category->children()->withTrashed()->restore();
+        });
+    }
 }

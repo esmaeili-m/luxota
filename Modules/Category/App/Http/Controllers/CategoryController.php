@@ -468,6 +468,24 @@ class CategoryController extends Controller
         );
     }
 
+    public function restore($id)
+    {
+        $this->service->restoreCategory($id);
+
+        return response()->json(['message' => 'Category restored successfully']);
+    }
+    public function forceDelete($id)
+    {
+        $this->service->forceDeleteCategory($id);
+
+        return response()->json(['message' => 'Category permanently deleted']);
+    }
+
+    public function trash()
+    {
+        $categories = $this->service->getTrashedCategories();
+        return CategoryResource::collection($categories);
+    }
     public function toggle_status($id)
     {
         $category = $this->service->toggle_status($id);

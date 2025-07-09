@@ -21,11 +21,14 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->name('api.')->group(function 
 Route::prefix('v1')
     ->name('api.v1.')
     ->group(function () {
-        Route::get('categories/all', [CategoryController::class, 'all'])->name('categories.all');
-        Route::post('categories/{id}/toggle-status', [CategoryController::class, 'toggle_status'])->name('categories.toggle_status');
+        Route::get('categories/all', [CategoryController::class, 'all']);
+        Route::delete('/categories/force-delete/{id}', [CategoryController::class, 'forceDelete']);
+        Route::post('/categories/restore/{id}', [CategoryController::class, 'restore']);
+        Route::get('categories/trash', [CategoryController::class, 'trash']);
+        Route::post('categories/{id}/toggle-status', [CategoryController::class, 'toggle_status']);
         Route::get('categories/search', [CategoryController::class, 'search']);
-        Route::get('categories/{id}/with-children', [CategoryController::class, 'showWithChildren'])->name('categories.showWithChildren');
-        Route::get('categories/{id}/with-parent', [CategoryController::class, 'showWithParent'])->name('categories.showWithParent');
+        Route::get('categories/{id}/with-children', [CategoryController::class, 'showWithChildren']);
+        Route::get('categories/{id}/with-parent', [CategoryController::class, 'showWithParent']);
         Route::apiResource('categories', CategoryController::class)->names('categories');
 
     });

@@ -18,11 +18,12 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->text('image')->nullable();
             $table->boolean('status')->default(1);
+            $table->integer('order')->default(1);
             $table->foreignId('parent_id')
                 ->nullable()
                 ->constrained('categories')
-                ->onUpdate('cascade')
-                ->onDelete('cascade');
+                ->onUpdate('CASCADE')
+                ->onDelete('CASCADE');
             $table->softDeletes();
             $table->timestamps();
         });
