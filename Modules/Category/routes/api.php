@@ -23,7 +23,7 @@ Route::prefix('v1')
     ->group(function () {
         Route::get('categories/all', [CategoryController::class, 'all']);
         Route::delete('/categories/force-delete/{id}', [CategoryController::class, 'forceDelete']);
-        Route::post('/categories/restore/{id}', [CategoryController::class, 'restore']);
+        Route::post('/categories/{id}/restore', [CategoryController::class, 'restore']);
         Route::get('categories/trash', [CategoryController::class, 'trash']);
         Route::post('categories/{id}/toggle-status', [CategoryController::class, 'toggle_status']);
         Route::get('categories/search', [CategoryController::class, 'search']);

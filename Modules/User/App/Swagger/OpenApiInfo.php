@@ -6,9 +6,9 @@ use OpenApi\Annotations as OA;
 
 /**
  * @OA\Info(
- *     title="My Laravel Modular API",
+ *     title="Inegration API",
  *     version="1.0.0",
- *     description="This is the Swagger documentation for the Laravel Modular API project."
+ *     description="This is the Swagger documentation for the Inegration API project."
  * )
  *
  * @OA\Server(

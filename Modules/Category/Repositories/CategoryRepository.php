@@ -22,6 +22,10 @@ class CategoryRepository
     {
         return Category::with($with)->findOrFail($id);
     }
+    public function findTrashedById(int $id)
+    {
+        return Category::withTrashed()->find($id);
+    }
 
     public function create(array $data)
     {

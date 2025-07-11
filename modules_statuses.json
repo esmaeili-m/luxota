@@ -9,5 +9,6 @@
     "Branch": true,
     "Category": true,
     "Permission": true,
-    "Product": true
+    "Product": true,
+    "Language": true
 }

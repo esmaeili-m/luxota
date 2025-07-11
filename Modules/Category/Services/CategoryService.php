@@ -84,9 +84,12 @@ class CategoryService
         return $this->repo->searchByFields($filters);
     }
 
-    public function restore($id)
+    public function restoreCategory($id)
     {
-        $category = $this->repo->find($id);
+        $category = $this->repo->findTrashedById($id);
+        if (!$category) {
+            return false;
+        }
         $this->repo->restore($category);
     }
     public function forceDeleteCategory($id)
