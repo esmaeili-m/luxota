@@ -62,6 +62,7 @@ class CategoryTableSeeder extends Seeder
                 'slug' => $data['slug'],
                 'image' => $data['image'] ?? '',
                 'status' => 1,
+                'category_code' => $data['code'],
                 'order' => $counter,
                 'parent_id' => $parentId,
                 'created_at' => Carbon::parse($createdAt),

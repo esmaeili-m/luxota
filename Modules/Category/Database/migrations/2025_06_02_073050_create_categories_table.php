@@ -16,6 +16,7 @@ return new class extends Migration
             $table->json('title');
             $table->json('subtitle');
             $table->string('slug')->unique();
+            $table->bigInteger('category_code')->default(10);
             $table->text('image')->nullable();
             $table->boolean('status')->default(1);
             $table->integer('order')->default(1);
@@ -35,6 +36,9 @@ return new class extends Migration
      */
     public function down(): void
     {
+        \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS = 0;');
         Schema::dropIfExists('categories');
+        \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS = 1;');
+
     }
 };

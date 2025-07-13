@@ -7,15 +7,15 @@ class CategoryRepository
 {
     public function all(): \Illuminate\Database\Eloquent\Collection
     {
-        return Category::all();
+        return Category::orderBy('order')->get();
     }
     public function getTrashedCategories(): \Illuminate\Database\Eloquent\Collection
     {
-        return Category::onlyTrashed()->whereNull('parent_id')->get();
+        return Category::onlyTrashed()->whereNull('parent_id')->orderBy('order')->get();
     }
     public function paginate(int $perPage = 15): LengthAwarePaginator
     {
-        return Category::whereNull('parent_id')->paginate($perPage);
+        return Category::whereNull('parent_id')->orderBy('order')->paginate($perPage);
     }
 
     public function find(int $id, array $with = [])
@@ -75,6 +75,10 @@ class CategoryRepository
 
                 case 'status':
                     $query->where('status', $value);
+                    break;
+
+                case 'category_code':
+                    $query->where('category_code', $value);
                     break;
 
             }

@@ -42,6 +42,12 @@ class CategoryService
         if (empty($data['slug'])) {
             $data['slug'] = Str::slug($data['title']['en']);
         }
+        if (empty($data['category_code'])) {
+            $data['category_code'] = Category::max('category_code')+1;
+        }
+        if (empty($data['order'])) {
+            $data['order'] = Category::max('order') + 1;
+        }
         return $this->repo->create($data);
     }
 

@@ -13,8 +13,9 @@ return new class extends Migration
     {
         Schema::create('roles', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
-            $table->boolean('status')->default(1);
+            $table->string('title')->unique();
+            $table->boolean('status')->default(true);
+            $table->timestamps();
             $table->softDeletes();
         });
     }
@@ -24,6 +25,9 @@ return new class extends Migration
      */
     public function down(): void
     {
+        \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS = 0;');
         Schema::dropIfExists('roles');
+        \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS = 1;');
+
     }
 };
