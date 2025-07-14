@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('referrers', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
+            $table->string('title')->unique();
             $table->boolean('status')->default(1);
             $table->softDeletes();
             $table->timestamps();

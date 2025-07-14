@@ -11,6 +11,6 @@ class ZoneDatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // $this->call([]);
+         $this->call([ZoneTableSeeder::class]);
     }
 }

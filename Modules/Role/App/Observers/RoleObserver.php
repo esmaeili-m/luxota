@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Observers;
+namespace Modules\Role\App\Observers;
 
 use \Modules\Role\App\Models\Role;
 
@@ -48,4 +48,4 @@ class RoleObserver
     {
         //
     }
-}
+} 

@@ -3,65 +3,522 @@
 namespace Modules\Referrer\App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Modules\Referrer\App\Http\Requests\CreateReferrerRequest;
+use Modules\Referrer\App\resources\ReferrerCollection;
+use Modules\Referrer\App\resources\ReferrerResource;
+use Modules\Referrer\Services\ReferrerService;
 
+/**
+ * @OA\Tag(
+ *     name="Referrers",
+ *     description="API Endpoints for managing referrers"
+ * )
+ */
 class ReferrerController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    protected ReferrerService $service;
+
+    public function __construct(ReferrerService $service)
     {
-        return view('referrer::index');
+        $this->service = $service;
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Get all referrers
+     *
+     * @OA\Get(
+     *     path="/api/v1/referrers/all",
+     *     tags={"Referrers"},
+     *     summary="Get all referrers",
+     *     description="Returns a list of all referrers",
+     *     operationId="getAllReferrers",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/Referrer")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated"
+     *     )
+     * )
      */
-    public function create()
+    public function all(): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
-        return view('referrer::create');
+        $referrers = $this->service->getAll();
+        return ReferrerResource::collection($referrers);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Get all referrers with pagination
+     *
+     * @OA\Get(
+     *     path="/api/v1/referrers",
+     *     tags={"Referrers"},
+     *     summary="Get list of referrers with pagination",
+     *     description="Returns a paginated list of referrers",
+     *     operationId="getReferrers",
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         required=false,
+     *         @OA\Schema(type="integer", example=1),
+     *         description="Page number"
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(ref="#/components/schemas/Referrer")
+     *             ),
+     *             @OA\Property(property="current_page", type="integer"),
+     *             @OA\Property(property="last_page", type="integer"),
+     *             @OA\Property(property="total", type="integer")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated"
+     *     )
+     * )
      */
-    public function store(Request $request): RedirectResponse
+    public function index(): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
-        //
+        $referrers = $this->service->getPaginated();
+        return ReferrerResource::collection($referrers);
     }
 
     /**
-     * Show the specified resource.
+     * Get Referrer By ID
+     *
+     * @OA\Get(
+     *     path="/api/v1/referrers/{id}",
+     *     tags={"Referrers"},
+     *     summary="Get a single referrer by ID",
+     *     description="Returns a specific referrer based on the provided ID",
+     *     operationId="getReferrerById",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1),
+     *         description="The ID of the referrer to retrieve"
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(ref="#/components/schemas/Referrer")
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Referrer not found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error", type="string", example="Not found")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated"
+     *     )
+     * )
      */
-    public function show($id)
+    public function show($id): ReferrerResource|\Illuminate\Http\JsonResponse
     {
-        return view('referrer::show');
+        $referrer = $this->service->getById($id);
+
+        if (!$referrer) {
+            return response()->json(['error' => 'Not found'], 404);
+        }
+
+        return new ReferrerResource($referrer);
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Create a new referrer
+     *
+     * @OA\Post(
+     *     path="/api/v1/referrers",
+     *     tags={"Referrers"},
+     *     summary="Create a new referrer",
+     *     description="Creates a new referrer with the provided data",
+     *     operationId="createReferrer",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"title"},
+     *             @OA\Property(property="title", type="string", example="Website Referral"),
+     *             @OA\Property(property="status", type="boolean", example=true)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Referrer created successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/Referrer")
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated"
+     *     )
+     * )
      */
-    public function edit($id)
+    public function store(CreateReferrerRequest $request): ReferrerResource
     {
-        return view('referrer::edit');
+        $referrer = $this->service->create($request->validated());
+        return new ReferrerResource($referrer);
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update an existing referrer
+     *
+     * @OA\Put(
+     *     path="/api/v1/referrers/{id}",
+     *     tags={"Referrers"},
+     *     summary="Update an existing referrer",
+     *     description="Updates an existing referrer with the provided data",
+     *     operationId="updateReferrer",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1),
+     *         description="The ID of the referrer to update"
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"title"},
+     *             @OA\Property(property="title", type="string", example="Updated Website Referral"),
+     *             @OA\Property(property="status", type="boolean", example=true)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Referrer updated successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/Referrer")
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Referrer not found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error", type="string", example="Not found")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated"
+     *     )
+     * )
      */
-    public function update(Request $request, $id): RedirectResponse
+    public function update($id, CreateReferrerRequest $request): ReferrerResource|\Illuminate\Http\JsonResponse
     {
-        //
+        $referrer = $this->service->update($id, $request->validated());
+
+        if (!$referrer) {
+            return response()->json(['error' => 'Not found'], 404);
+        }
+
+        return new ReferrerResource($referrer);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Delete a referrer
+     *
+     * @OA\Delete(
+     *     path="/api/v1/referrers/{id}",
+     *     tags={"Referrers"},
+     *     summary="Delete a referrer",
+     *     description="Soft deletes a referrer by ID",
+     *     operationId="deleteReferrer",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1),
+     *         description="The ID of the referrer to delete"
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Referrer deleted successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Referrer deleted successfully")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Referrer not found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error", type="string", example="Not found")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated"
+     *     )
+     * )
      */
-    public function destroy($id)
+    public function destroy($id): \Illuminate\Http\JsonResponse
     {
-        //
+        $deleted = $this->service->delete($id);
+
+        if (!$deleted) {
+            return response()->json(['error' => 'Not found'], 404);
+        }
+
+        return response()->json(['message' => 'Referrer deleted successfully']);
+    }
+
+    /**
+     * Search referrers
+     *
+     * @OA\Get(
+     *     path="/api/v1/referrers/search",
+     *     tags={"Referrers"},
+     *     summary="Search referrers",
+     *     description="Search referrers by various fields",
+     *     operationId="searchReferrers",
+     *     @OA\Parameter(
+     *         name="title",
+     *         in="query",
+     *         required=false,
+     *         @OA\Schema(type="string"),
+     *         description="Search by title"
+     *     ),
+     *     @OA\Parameter(
+     *         name="status",
+     *         in="query",
+     *         required=false,
+     *         @OA\Schema(type="boolean"),
+     *         description="Filter by status"
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(ref="#/components/schemas/Referrer")
+     *             ),
+     *             @OA\Property(property="total", type="integer")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated"
+     *     )
+     * )
+     */
+    public function search(Request $request): ReferrerCollection
+    {
+        $filters = $request->only(['title', 'status']);
+        $referrers = $this->service->searchByFields($filters);
+        return new ReferrerCollection($referrers);
+    }
+
+    /**
+     * Restore a deleted referrer
+     *
+     * @OA\Post(
+     *     path="/api/v1/referrers/{id}/restore",
+     *     tags={"Referrers"},
+     *     summary="Restore a deleted referrer",
+     *     description="Restores a soft deleted referrer",
+     *     operationId="restoreReferrer",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1),
+     *         description="The ID of the referrer to restore"
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Referrer restored successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Referrer restored successfully")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Referrer not found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error", type="string", example="Not found")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated"
+     *     )
+     * )
+     */
+    public function restore($id): \Illuminate\Http\JsonResponse
+    {
+        $restored = $this->service->restoreReferrer($id);
+
+        if (!$restored) {
+            return response()->json(['error' => 'Not found'], 404);
+        }
+
+        return response()->json(['message' => 'Referrer restored successfully']);
+    }
+
+    /**
+     * Force delete a referrer
+     *
+     * @OA\Delete(
+     *     path="/api/v1/referrers/force-delete/{id}",
+     *     tags={"Referrers"},
+     *     summary="Force delete a referrer",
+     *     description="Permanently deletes a referrer from the database",
+     *     operationId="forceDeleteReferrer",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1),
+     *         description="The ID of the referrer to permanently delete"
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Referrer permanently deleted",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Referrer permanently deleted")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Referrer not found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error", type="string", example="Not found")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated"
+     *     )
+     * )
+     */
+    public function forceDelete($id): \Illuminate\Http\JsonResponse
+    {
+        try {
+            $this->service->forceDeleteReferrer($id);
+            return response()->json(['message' => 'Referrer permanently deleted']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Not found'], 404);
+        }
+    }
+
+    /**
+     * Get trashed referrers
+     *
+     * @OA\Get(
+     *     path="/api/v1/referrers/trash",
+     *     tags={"Referrers"},
+     *     summary="Get trashed referrers",
+     *     description="Returns a list of soft deleted referrers",
+     *     operationId="getTrashedReferrers",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/Referrer")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated"
+     *     )
+     * )
+     */
+    public function trash(): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    {
+        $referrers = $this->service->getTrashedReferrers();
+        return ReferrerResource::collection($referrers);
+    }
+
+    /**
+     * Toggle referrer status
+     *
+     * @OA\Post(
+     *     path="/api/v1/referrers/{id}/toggle-status",
+     *     tags={"Referrers"},
+     *     summary="Toggle referrer status",
+     *     description="Toggles the status of a referrer between active and inactive",
+     *     operationId="toggleReferrerStatus",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1),
+     *         description="The ID of the referrer to toggle status"
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Status changed successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Change Status successfully")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Referrer not found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error", type="string", example="Not found")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated"
+     *     )
+     * )
+     */
+    public function toggle_status($id): ReferrerResource|\Illuminate\Http\JsonResponse
+    {
+        $referrer = $this->service->getById($id);
+
+        if (!$referrer) {
+            return response()->json(['error' => 'Not found'], 404);
+        }
+
+        $this->service->toggle_status($id);
+        return new ReferrerResource($referrer->fresh());
     }
 }

@@ -1,13 +1,13 @@
 <?php
 
-namespace Modules\Zone\App\Models;
+namespace Modules\Referrer\App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Modules\Zone\Database\factories\ZoneFactory;
+use Modules\Referrer\Database\factories\ReferrerFactory;
 
-class Zone extends Model
+class Referrer extends Model
 {
     use HasFactory, SoftDeletes;
 
@@ -16,7 +16,6 @@ class Zone extends Model
      */
     protected $fillable = [
         'title',
-        'description',
         'status'
     ];
 
@@ -26,4 +25,4 @@ class Zone extends Model
     protected $casts = [
         'status' => 'boolean',
     ];
-}
+} 

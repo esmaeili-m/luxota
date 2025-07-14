@@ -22,6 +22,7 @@ class ZoneServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/migrations'));
+        $this->registerObservers();
     }
 
     /**
@@ -30,6 +31,10 @@ class ZoneServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->register(RouteServiceProvider::class);
+        
+        // Register dependencies
+        $this->app->bind(\Modules\Zone\Repositories\ZoneRepository::class);
+        $this->app->bind(\Modules\Zone\Services\ZoneService::class);
     }
 
     /**
@@ -90,6 +95,14 @@ class ZoneServiceProvider extends ServiceProvider
 
         $componentNamespace = str_replace('/', '\\', config('modules.namespace').'\\'.$this->moduleName.'\\'.config('modules.paths.generator.component-class.path'));
         Blade::componentNamespace($componentNamespace, $this->moduleNameLower);
+    }
+
+    /**
+     * Register observers.
+     */
+    protected function registerObservers(): void
+    {
+        \Modules\Zone\App\Models\Zone::observe(\Modules\Zone\App\Observers\ZoneObserver::class);
     }
 
     /**

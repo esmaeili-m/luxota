@@ -22,6 +22,7 @@ class RoleServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/migrations'));
+        $this->registerObservers();
     }
 
     /**
@@ -90,6 +91,14 @@ class RoleServiceProvider extends ServiceProvider
 
         $componentNamespace = str_replace('/', '\\', config('modules.namespace').'\\'.$this->moduleName.'\\'.config('modules.paths.generator.component-class.path'));
         Blade::componentNamespace($componentNamespace, $this->moduleNameLower);
+    }
+
+    /**
+     * Register observers.
+     */
+    protected function registerObservers(): void
+    {
+        \Modules\Role\App\Models\Role::observe(\Modules\Role\App\Observers\RoleObserver::class);
     }
 
     /**

@@ -13,9 +13,11 @@ return new class extends Migration
     {
         Schema::create('zones', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
+            $table->string('title')->unique();
             $table->text('description')->nullable();
-            $table->boolean('status')->default(1);
+            $table->boolean('status')->default(true);
+            $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -24,6 +26,8 @@ return new class extends Migration
      */
     public function down(): void
     {
+        \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS = 0;');
         Schema::dropIfExists('zones');
+        \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS = 1;');
     }
 };
