@@ -21,9 +21,7 @@ class ZoneObserver
     {
         if ($zone->isDirty('status')) {
             $newStatus = $zone->status;
-            // Update related data when zone status changes
-            // For example, if you have branches or other related models
-            // $zone->branches()->update(['status' => $newStatus]);
+            $zone->users()->update(['status' => $newStatus]);
         }
     }
 
@@ -32,7 +30,11 @@ class ZoneObserver
      */
     public function deleted(Zone $zone): void
     {
-        //
+        if (!$zone->isForceDeleting()) {
+            $zone->users()->each(function ($user) {
+                $user->delete();
+            });
+        }
     }
 
     /**
@@ -40,7 +42,9 @@ class ZoneObserver
      */
     public function restored(Zone $zone): void
     {
-        //
+        $zone->users()->withTrashed()->each(function ($user) {
+            $user->restore();
+        });
     }
 
     /**
@@ -50,4 +54,4 @@ class ZoneObserver
     {
         //
     }
-} 
+}

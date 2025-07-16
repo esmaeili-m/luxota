@@ -4,6 +4,8 @@ namespace Modules\Rank\App\Providers;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use Modules\Rank\App\Models\Rank;
+use Modules\Rank\App\Observers\RankObserver;
 
 class RankServiceProvider extends ServiceProvider
 {
@@ -22,6 +24,9 @@ class RankServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/migrations'));
+        
+        // Register observers
+        Rank::observe(RankObserver::class);
     }
 
     /**

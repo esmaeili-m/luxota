@@ -2,40 +2,102 @@
 
 namespace Modules\User\App\Swagger;
 
-use OpenApi\Annotations as OA;
-
-/**
- * @OA\Info(
- *     title="Your API Title",
- *     version="1.0.0",
- *     description="API documentation for your Laravel project"
- * )
- */
 /**
  * @OA\Schema(
  *     schema="User",
- *     required={"id", "name", "email", "phone", "password"},
+ *     title="User",
+ *     description="User model",
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="name", type="string", example="John Doe"),
  *     @OA\Property(property="email", type="string", format="email", example="john@example.com"),
- *     @OA\Property(property="phone", type="string", example="+989123456789"),
- *     @OA\Property(property="password", type="string", format="password", example="secret123"),
+ *     @OA\Property(property="phone", type="string", example="+1234567890"),
+ *     @OA\Property(property="description", type="string", example="User description"),
+ *     @OA\Property(property="avatar", type="string", example="avatar.jpg"),
+ *     @OA\Property(property="website", type="object", example={"website": "https://example.com", "instagram": "john_doe", "telegram": "johndoe"}),
+ *     @OA\Property(property="address", type="string", example="123 Main St"),
+ *     @OA\Property(property="luxota_website", type="string", example="https://luxota.com/john"),
+ *     @OA\Property(property="status", type="boolean", example=true),
+ *     @OA\Property(property="status_label", type="string", example="active"),
+ *     @OA\Property(property="country_code", type="string", example="US"),
+ *     @OA\Property(property="whatsapp_number", type="string", example="+1234567890"),
  *     @OA\Property(property="role_id", type="integer", example=1),
- *     @OA\Property(property="zone_id", type="integer", example=2),
- *     @OA\Property(property="description", type="string", nullable=true, example="توضیحات اضافی کاربر"),
- *     @OA\Property(property="city_id", type="integer", example=112),
- *     @OA\Property(property="avatar", type="string", nullable=true, example="https://example.com/avatar.jpg"),
- *     @OA\Property(property="website", type="object", nullable=true, example={"en": "https://site.com", "fa": "https://site.ir"}),
- *     @OA\Property(property="remember_token", type="string", nullable=true, example="1|some-token-here"),
- *     @OA\Property(property="address", type="string", nullable=true, example="تهران، ایران"),
+ *     @OA\Property(property="zone_id", type="integer", example=1),
+ *     @OA\Property(property="city_id", type="integer", example=1),
  *     @OA\Property(property="rank_id", type="integer", example=2),
  *     @OA\Property(property="referrer_id", type="integer", example=1),
- *     @OA\Property(property="branche_id", type="integer", example=3),
- *     @OA\Property(property="luxota_website", type="string", nullable=true, example="https://luxota.ir"),
- *     @OA\Property(property="parent_id", type="integer", nullable=true, example=5),
- *     @OA\Property(property="status", type="boolean", example=true),
- *     @OA\Property(property="country_code", type="string", nullable=true, example="+98"),
- *     @OA\Property(property="whatsapp_number", type="string", nullable=true, example="9123456789")
+ *     @OA\Property(property="branch_id", type="integer", example=1),
+ *     @OA\Property(property="parent_id", type="integer", nullable=true, example=null),
+ *     @OA\Property(property="created_at", type="string", format="date-time"),
+ *     @OA\Property(property="updated_at", type="string", format="date-time"),
+ *     @OA\Property(property="deleted_at", type="string", format="date-time", nullable=true),
+ *     @OA\Property(
+ *         property="role",
+ *         type="object",
+ *         @OA\Property(property="id", type="integer", example=1),
+ *         @OA\Property(property="title", type="string", example="Admin")
+ *     ),
+ *     @OA\Property(
+ *         property="zone",
+ *         type="object",
+ *         @OA\Property(property="id", type="integer", example=1),
+ *         @OA\Property(property="name", type="string", example="North Zone")
+ *     ),
+ *     @OA\Property(
+ *         property="city",
+ *         type="object",
+ *         @OA\Property(property="id", type="integer", example=1),
+ *         @OA\Property(property="name", type="string", example="Tehran")
+ *     ),
+ *     @OA\Property(
+ *         property="rank",
+ *         type="object",
+ *         @OA\Property(property="id", type="integer", example=2),
+ *         @OA\Property(property="title", type="string", example="Manager")
+ *     ),
+ *     @OA\Property(
+ *         property="referrer",
+ *         type="object",
+ *         @OA\Property(property="id", type="integer", example=1),
+ *         @OA\Property(property="name", type="string", example="Admin User"),
+ *         @OA\Property(property="email", type="string", example="admin@luxota.com")
+ *     ),
+ *     @OA\Property(
+ *         property="branch",
+ *         type="object",
+ *         @OA\Property(property="id", type="integer", example=1),
+ *         @OA\Property(property="name", type="string", example="Main Branch")
+ *     ),
+ *     @OA\Property(
+ *         property="parent",
+ *         type="object",
+ *         nullable=true,
+ *         @OA\Property(property="id", type="integer", example=1),
+ *         @OA\Property(property="name", type="string", example="Parent User"),
+ *         @OA\Property(property="email", type="string", example="parent@luxota.com")
+ *     ),
+ *     @OA\Property(
+ *         property="children",
+ *         type="array",
+ *         @OA\Items(
+ *             type="object",
+ *             @OA\Property(property="id", type="integer", example=2),
+ *             @OA\Property(property="name", type="string", example="Child User"),
+ *             @OA\Property(property="email", type="string", example="child@luxota.com")
+ *         )
+ *     ),
+ *     @OA\Property(
+ *         property="referred_users",
+ *         type="array",
+ *         @OA\Items(
+ *             type="object",
+ *             @OA\Property(property="id", type="integer", example=3),
+ *             @OA\Property(property="name", type="string", example="Referred User"),
+ *             @OA\Property(property="email", type="string", example="referred@luxota.com")
+ *         )
+ *     )
  * )
  */
-class UserSwagger {}
+class UserSwagger
+{
+    // This class is used for Swagger documentation only
+}

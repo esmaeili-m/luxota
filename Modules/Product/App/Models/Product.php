@@ -10,9 +10,9 @@ use Modules\Category\App\Models\Category;
 class Product extends Model
 {
     use HasFactory, SoftDeletes;
-    
+
     protected $guarded = [];
-    
+
     protected $fillable = [
         'title',
         'description',
@@ -28,7 +28,7 @@ class Product extends Model
         'status',
         'category_id',
     ];
-    
+
     protected $casts = [
         'title' => 'array',
         'description' => 'array',
@@ -37,7 +37,6 @@ class Product extends Model
         'version' => 'float',
         'show_price' => 'boolean',
         'payment_type' => 'boolean',
-        'status' => 'boolean',
         'order' => 'integer',
     ];
 

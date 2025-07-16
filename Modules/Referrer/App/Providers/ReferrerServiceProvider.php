@@ -4,6 +4,8 @@ namespace Modules\Referrer\App\Providers;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use Modules\Referrer\App\Models\Referrer;
+use Modules\Referrer\App\Observers\ReferrerObserver;
 
 class ReferrerServiceProvider extends ServiceProvider
 {
@@ -22,6 +24,9 @@ class ReferrerServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/migrations'));
+        
+        // Register observers
+        Referrer::observe(ReferrerObserver::class);
     }
 
     /**

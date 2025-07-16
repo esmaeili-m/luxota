@@ -7,17 +7,17 @@ class ZoneRepository
 {
     public function all(): \Illuminate\Database\Eloquent\Collection
     {
-        return Zone::orderBy('title')->get();
+        return Zone::get();
     }
 
     public function getTrashedZones(): \Illuminate\Database\Eloquent\Collection
     {
-        return Zone::onlyTrashed()->orderBy('title')->get();
+        return Zone::onlyTrashed()->get();
     }
 
     public function paginate(int $perPage = 15): LengthAwarePaginator
     {
-        return Zone::orderBy('title')->paginate($perPage);
+        return Zone::paginate($perPage);
     }
 
     public function find(int $id, array $with = [])
@@ -80,4 +80,4 @@ class ZoneRepository
 
         return $query->get();
     }
-} 
+}

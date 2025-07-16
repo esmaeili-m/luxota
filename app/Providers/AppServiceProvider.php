@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use App\Observers\RoleObserver;
 use Illuminate\Support\ServiceProvider;
 use Modules\Role\App\Models\Role;
 

@@ -4,6 +4,8 @@ namespace Modules\City\App\Providers;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use Modules\City\App\Models\City;
+use Modules\City\App\Observers\CityObserver;
 
 class CityServiceProvider extends ServiceProvider
 {
@@ -22,6 +24,9 @@ class CityServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/migrations'));
+        
+        // Register observers
+        City::observe(CityObserver::class);
     }
 
     /**

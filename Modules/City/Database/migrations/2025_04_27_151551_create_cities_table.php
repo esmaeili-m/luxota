@@ -16,7 +16,6 @@ return new class extends Migration
                 $table->foreignId('country_id')->constrained('countries')->onUpdate('cascade')->onDelete('cascade');
                 $table->string('en');
                 $table->string('abb');
-                $table->string('priority');
                 $table->boolean('status')->default(true);
                 $table->string('fa')->nullable();
                 $table->string('ar')->nullable();

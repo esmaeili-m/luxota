@@ -4,6 +4,8 @@ namespace Modules\Branch\App\Providers;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use Modules\Branch\App\Models\Branch;
+use Modules\Branch\App\Observers\BranchObserver;
 
 class BranchServiceProvider extends ServiceProvider
 {
@@ -22,6 +24,9 @@ class BranchServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/migrations'));
+        
+        // Register observers
+        Branch::observe(BranchObserver::class);
     }
 
     /**

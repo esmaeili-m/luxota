@@ -14,16 +14,14 @@ class Zone extends Model
     /**
      * The attributes that are mass assignable.
      */
-    protected $fillable = [
-        'title',
-        'description',
-        'status'
-    ];
+    protected $guarded = [];
 
     /**
      * The attributes that should be cast.
      */
-    protected $casts = [
-        'status' => 'boolean',
-    ];
+    protected $casts = [];
+    public function users()
+    {
+        return $this->hasMany(\App\Models\User::class);
+    }
 }

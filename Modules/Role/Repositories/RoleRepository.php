@@ -7,17 +7,17 @@ class RoleRepository
 {
     public function all(): \Illuminate\Database\Eloquent\Collection
     {
-        return Role::orderBy('title')->get();
+        return Role::get();
     }
 
     public function getTrashedRoles(): \Illuminate\Database\Eloquent\Collection
     {
-        return Role::onlyTrashed()->orderBy('title')->get();
+        return Role::onlyTrashed()->get();
     }
 
     public function paginate(int $perPage = 15): LengthAwarePaginator
     {
-        return Role::orderBy('title')->paginate($perPage);
+        return Role::paginate($perPage);
     }
 
     public function find(int $id, array $with = [])

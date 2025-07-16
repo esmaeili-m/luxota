@@ -30,7 +30,11 @@ class RoleObserver
      */
     public function deleted(Role $role): void
     {
-        //
+        if (!$role->isForceDeleting()) {
+            $role->users()->each(function ($user) {
+                $user->delete();
+            });
+        }
     }
 
     /**
@@ -38,14 +42,14 @@ class RoleObserver
      */
     public function restored(Role $role): void
     {
-        //
+        $role->users()->withTrashed()->each(function ($user) {
+            $user->restore();
+        });
     }
 
-    /**
-     * Handle the Role "force deleted" event.
-     */
+
     public function forceDeleted(Role $role): void
     {
-        //
+
     }
-} 
+}

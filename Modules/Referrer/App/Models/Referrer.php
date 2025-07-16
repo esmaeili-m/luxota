@@ -23,6 +23,13 @@ class Referrer extends Model
      * The attributes that should be cast.
      */
     protected $casts = [
-        'status' => 'boolean',
     ];
-} 
+
+    /**
+     * Get the users that belong to this referrer type.
+     */
+    public function users()
+    {
+        return $this->hasMany(\App\Models\User::class);
+    }
+}
