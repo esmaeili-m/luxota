@@ -4,6 +4,8 @@ namespace Modules\Country\App\Providers;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use Modules\Country\App\Models\Country;
+use Modules\Country\App\Observers\CountryObserver;
 
 class CountryServiceProvider extends ServiceProvider
 {
@@ -22,6 +24,7 @@ class CountryServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/migrations'));
+        $this->registerObservers();
     }
 
     /**
@@ -90,6 +93,14 @@ class CountryServiceProvider extends ServiceProvider
 
         $componentNamespace = str_replace('/', '\\', config('modules.namespace').'\\'.$this->moduleName.'\\'.config('modules.paths.generator.component-class.path'));
         Blade::componentNamespace($componentNamespace, $this->moduleNameLower);
+    }
+
+    /**
+     * Register observers.
+     */
+    protected function registerObservers(): void
+    {
+        Country::observe(CountryObserver::class);
     }
 
     /**

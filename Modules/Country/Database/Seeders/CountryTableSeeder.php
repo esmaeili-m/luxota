@@ -1,13 +1,13 @@
 <?php
 
-namespace Modules\City\Database\Seeders;
+namespace Modules\Country\Database\Seeders;
 
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use League\Csv\Reader;
-use Modules\City\App\Models\City;
+use Modules\Country\App\Models\Country;
 
-class CityTableSeeder extends Seeder
+class CountryTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -15,28 +15,30 @@ class CityTableSeeder extends Seeder
     public function run(): void
     {
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-        City::truncate();
-        $path = database_path('seeders/data/cities.csv');
+        Country::truncate();
+        $path = database_path('seeders/data/countries.csv');
         $file = fopen($path, 'r');
         $headers = fgetcsv($file, 1000, ',');
 
-        $cities = [];
+        $countries = [];
         $counter=1;
-        while (($row = fgetcsv($file, 5000000, ',')) !== false) {
+        while (($row = fgetcsv($file, 1000, ',')) !== false) {
             $data = array_combine($headers, $row);
-            $cities[] = [
+//            dd($data);
+            $countries[] = [
                 'en' => $data['en'],
                 'fa' => $data['fa'],
-                'ar' => $data['ar'],
+                'zone_id' => $data['zone_id']  == '' ? null : $data['zone_id'],
                 'abb' => $data['abb'] ?? '',
-                'country_id' => $data['country_id'],
+                'phone_code' => $data['phone_code'],
+                'flag' => $data['flag'],
                 'created_at'=> now(),
                 'updated_at'=> now(),
             ];
             $counter++;
         }
         fclose($file);
-        DB::table('cities')->insert($cities);
+        DB::table('countries')->insert($countries);
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
 }

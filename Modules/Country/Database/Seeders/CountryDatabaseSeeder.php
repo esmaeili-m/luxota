@@ -3,6 +3,8 @@
 namespace Modules\Country\Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Modules\Category\Database\Seeders\CategoryTableSeeder;
+use Modules\Country\App\Models\Country;
 
 class CountryDatabaseSeeder extends Seeder
 {
@@ -11,6 +13,8 @@ class CountryDatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // $this->call([]);
+        $this->call([CountryTableSeeder::class]);
+
+
     }
 }

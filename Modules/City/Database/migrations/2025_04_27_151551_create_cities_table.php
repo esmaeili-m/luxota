@@ -19,8 +19,6 @@ return new class extends Migration
                 $table->boolean('status')->default(true);
                 $table->string('fa')->nullable();
                 $table->string('ar')->nullable();
-                $table->string('ku')->nullable();
-                $table->string('tr')->nullable();
                 $table->softDeletes();
                 $table->timestamps();
         });
@@ -31,6 +29,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS = 0;');
+
         Schema::dropIfExists('cities');
+        \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS = 1;');
+
     }
 };

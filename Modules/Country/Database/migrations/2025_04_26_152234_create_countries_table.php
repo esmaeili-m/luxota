@@ -14,11 +14,8 @@ return new class extends Migration
         Schema::create('countries', function (Blueprint $table) {
             $table->id();
             $table->string('en');
-            $table->string('abb')->nullable();
             $table->string('fa')->nullable();
-            $table->string('ar')->nullable();
-            $table->string('ku')->nullable();
-            $table->string('tr')->nullable();
+            $table->string('abb')->nullable();
             $table->string('phone_code')->nullable();
             $table->text('flag')->nullable();
             $table->integer('zone_id')->nullable();

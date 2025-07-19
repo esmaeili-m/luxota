@@ -25,6 +25,12 @@ class Country extends Model
     }
 
     /**
+     * The attributes that should be cast.
+     */
+    protected $casts = [
+    ];
+
+    /**
      * Get the zone for the country.
      */
     public function zone()
@@ -32,8 +38,5 @@ class Country extends Model
         return $this->belongsTo(\Modules\Zone\App\Models\Zone::class);
     }
 
-    protected static function newFactory(): CountryFactory
-    {
-        return CountryFactory::new();
-    }
-} 
+
+}
