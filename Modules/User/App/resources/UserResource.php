@@ -24,6 +24,7 @@ class UserResource extends JsonResource
             'status' => $this->status,
             'status_label' => $this->status ? 'active' : 'inactive',
             'country_code' => $this->country_code,
+            'whatsapp_country_code' => $this->whatsapp_country_code,
             'whatsapp_number' => $this->whatsapp_number,
             'role_id' => $this->role_id,
             'zone_id' => $this->zone_id,
@@ -35,7 +36,7 @@ class UserResource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'deleted_at' => $this->deleted_at,
-            
+
             // Relationships
             'role' => $this->whenLoaded('role', function () {
                 return [
@@ -52,7 +53,8 @@ class UserResource extends JsonResource
             'city' => $this->whenLoaded('city', function () {
                 return [
                     'id' => $this->city->id,
-                    'name' => $this->city->name,
+                    'name' => $this->city->en,
+                    'country' => $this->city?->country?->en,
                 ];
             }),
             'rank' => $this->whenLoaded('rank', function () {
@@ -101,4 +103,4 @@ class UserResource extends JsonResource
             }),
         ];
     }
-} 
+}

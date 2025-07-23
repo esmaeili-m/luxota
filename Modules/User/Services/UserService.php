@@ -2,6 +2,7 @@
 
 namespace Modules\User\Services;
 
+use App\Services\Uploader;
 use Modules\User\App\Models\User;
 use Modules\User\Repositories\UserRepository;
 
@@ -23,6 +24,10 @@ class UserService
     {
         return $this->repo->all();
     }
+    public function getUserRole(int $role_id, array $filters = []): \Illuminate\Pagination\LengthAwarePaginator
+    {
+        return $this->repo->userRole($role_id, $filters);
+    }
 
     public function getTrashedUsers(): \Illuminate\Database\Eloquent\Collection
     {
@@ -36,6 +41,9 @@ class UserService
 
     public function create(array $data)
     {
+        if (isset($data['avatar'])) {
+            $data['avatar'] = Uploader::uploadImage($data['avatar'], 'users');
+        }
         return $this->repo->create($data);
     }
 
@@ -46,7 +54,9 @@ class UserService
         if (!$user) {
             return null;
         }
-
+        if (isset($data['avatar'])) {
+            $data['avatar'] = Uploader::uploadImage($data['avatar'], 'users');
+        }
         $this->repo->update($user, $data);
 
         return $user->fresh();
@@ -87,4 +97,4 @@ class UserService
         $this->repo->update($user, ['status' => $newStatus]);
         return response()->json(['message' => 'Change Status successfully']);
     }
-} 
+}

@@ -26,11 +26,12 @@ return new class extends Migration
             $table->boolean('status')->default(true);
             $table->string('country_code')->nullable();
             $table->string('whatsapp_number')->nullable();
+            $table->string('whatsapp_country_code')->nullable();
             $table->foreignId('role_id')->default(1)->constrained()->onDelete('cascade')->onUpdate('cascade');
             $table->foreignId('zone_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
             $table->foreignId('city_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
             $table->foreignId('rank_id')->default(2)->constrained()->onDelete('cascade')->onUpdate('cascade');
-            $table->foreignId('referrer_id')->default(1)->constrained('users')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreignId('referrer_id')->default(1)->constrained()->onDelete('cascade')->onUpdate('cascade');
             $table->foreignId('branch_id')->default(1)->constrained()->onDelete('cascade')->onUpdate('cascade');
             $table->foreignId('parent_id')->nullable()->constrained('users')->onDelete('cascade')->onUpdate('cascade');
             $table->softDeletes();

@@ -29,6 +29,7 @@ class User extends Authenticatable
         'luxota_website',
         'status',
         'country_code',
+        'whatsapp_country_code',
         'whatsapp_number',
         'role_id',
         'zone_id',
@@ -54,7 +55,6 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
         'website' => 'array',
-        'status' => 'boolean',
     ];
 
     /**

@@ -9,14 +9,14 @@ class CountryRepository
 {
     public function all(): \Illuminate\Database\Eloquent\Collection
     {
-        return Country::orderBy('en')->get();
+        return Country::orderBy('en')->where('phone_code','')->get();
     }
 
     public function getActive(): \Illuminate\Database\Eloquent\Collection
     {
-        return Country::where('status', true)->orderBy('en')->get();
+        return Country::where('status', true)->whereNot('phone_code','')->orderBy('en')->get();
     }
-    
+
     public function paginate(int $perPage = 15): LengthAwarePaginator
     {
         return Country::paginate($perPage);

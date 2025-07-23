@@ -95,6 +95,22 @@ class UserController extends Controller
         $users = $this->service->getPaginated();
         return UserResource::collection($users);
     }
+    public function userRole($role_id, Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    {
+        $filters = $request->only([
+            'name',
+            'email',
+            'phone',
+            'status',
+            'zone_id',
+            'city_id',
+            'rank_id',
+            'branch_id'
+        ]);
+
+        $users = $this->service->getUserRole($role_id, $filters);
+        return UserResource::collection($users);
+    }
 
     /**
      * Get User By ID
@@ -142,7 +158,6 @@ class UserController extends Controller
         if (!$user) {
             return response()->json(['error' => 'Not found'], 404);
         }
-
         return new UserResource($user);
     }
 
@@ -202,6 +217,7 @@ class UserController extends Controller
      */
     public function store(CreateUserRequest $request): UserResource
     {
+
         $user = $this->service->create($request->validated());
         return new UserResource($user);
     }
@@ -276,6 +292,7 @@ class UserController extends Controller
      */
     public function update($id, CreateUserRequest $request): UserResource|\Illuminate\Http\JsonResponse
     {
+
         $user = $this->service->update($id, $request->validated());
 
         if (!$user) {
@@ -402,7 +419,6 @@ class UserController extends Controller
             'rank_id',
             'branch_id'
         ]);
-
         $users = $this->service->searchByFields($filters);
 
         return new UserCollection($users);

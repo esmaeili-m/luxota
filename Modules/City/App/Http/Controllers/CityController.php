@@ -374,11 +374,11 @@ class CityController extends Controller
      *     )
      * )
      */
-    public function search(Request $request): CityCollection
+    public function search(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
         $filters = $request->only(['en', 'abb', 'country_id', 'status', 'priority']);
         $cities = $this->service->searchByFields($filters);
-        return new CityCollection($cities);
+        return CityResource::collection($cities);
     }
 
     /**

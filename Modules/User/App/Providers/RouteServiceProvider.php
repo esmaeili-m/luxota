@@ -19,6 +19,7 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+
         parent::boot();
     }
 
@@ -39,6 +40,7 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function mapWebRoutes(): void
     {
+
         Route::middleware('web')
             ->namespace($this->moduleNamespace)
             ->group(module_path('User', '/routes/web.php'));
