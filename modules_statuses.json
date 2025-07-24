@@ -10,5 +10,6 @@
     "Category": true,
     "Permission": true,
     "Product": true,
-    "Language": true
+    "Language": true,
+    "Auth": true
 }

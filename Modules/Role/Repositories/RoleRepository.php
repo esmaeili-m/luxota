@@ -1,7 +1,7 @@
 <?php
 namespace Modules\Role\Repositories;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Modules\Role\App\Models\Role;
+use Spatie\Permission\Models\Role;
 
 class RoleRepository
 {
@@ -64,8 +64,8 @@ class RoleRepository
             if (empty($value)) continue;
 
             switch ($field) {
-                case 'title':
-                    $query->where('title', 'like', "%{$value}%");
+                case 'name':
+                    $query->where('name', 'like', "%{$value}%");
                     break;
 
                 case 'status':
