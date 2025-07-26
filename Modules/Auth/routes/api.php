@@ -14,12 +14,8 @@ use Modules\Auth\App\Http\Controllers\AuthController;
     |
 */
 
-Route::middleware(['auth:sanctum'])->prefix('v1')->name('api.')->group(function () {
-    Route::get('auth', fn (Request $request) => $request->user())->name('auth');
-});
 
-
-Route::prefix('auth')->group(function () {
+Route::prefix('v1/auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
 
     Route::middleware('auth:sanctum')->group(function () {

@@ -13,7 +13,7 @@ class RoleResource extends JsonResource
     {
         return [
             'id'          => $this->id,
-            'title'       => $this->title,
+            'name'       => $this->name,
             'status'      => $this->status,
             'status_label'=> $this->status == 1 ? 'active' : 'inactive',
             'created_at'  => $this->created_at,
