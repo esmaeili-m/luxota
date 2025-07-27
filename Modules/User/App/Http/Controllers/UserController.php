@@ -4,10 +4,18 @@ namespace Modules\User\App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Modules\Branch\App\Models\Branch;
+use Modules\Country\App\Models\Country;
+use Modules\Rank\App\Models\Rank;
+use Modules\Referrer\App\Models\Referrer;
 use Modules\User\App\Http\Requests\CreateUserRequest;
+use Modules\User\App\Models\User;
 use Modules\User\App\resources\UserCollection;
 use Modules\User\App\resources\UserResource;
 use Modules\User\Services\UserService;
+use Modules\Zone\App\Models\Zone;
+use Modules\Zone\App\resources\ZoneResource;
+use Spatie\Permission\Models\Role;
 
 /**
  * @OA\Tag(
@@ -24,6 +32,18 @@ class UserController extends Controller
         $this->service = $service;
     }
 
+    public function UserFormData()
+    {
+        return response()->json([
+            'roles' => Role::where('status',1)->pluck('name','id'),
+            'countries' => Country::where('status',1)->whereNot('phone_code','=','')->pluck('phone_code','id'),
+            'zones' => Zone::where('status',1)->pluck('title', 'id'),
+            'ranks' => Rank::where('status',1)->pluck('title','id'),
+            'referrers' => Referrer::where('status',1)->pluck('title','id'),
+            'branches' => Branch::where('status',1)->pluck('title','id'),
+            'parents' => User::where('status',1)->where('role_id',1)->whereNull('parent_id')->select('name','email','id')->get(),
+        ]);
+    }
     /**
      * Get all users
      *

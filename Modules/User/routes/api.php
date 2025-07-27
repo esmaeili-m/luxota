@@ -23,6 +23,7 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->name('api.')->group(function 
         ->name('api.v1.')
         ->group(function () {
             Route::get('users/all', [UserController::class, 'all']);
+            Route::get('users/user-form-data', [UserController::class, 'UserFormData']);
             Route::post('users/user-role/{role_id}', [UserController::class, 'userRole']);
             Route::delete('users/force-delete/{id}', [UserController::class, 'forceDelete']);
             Route::post('users/{id}/restore', [UserController::class, 'restore']);
