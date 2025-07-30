@@ -3,11 +3,13 @@
 namespace Modules\User\App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Modules\Branch\App\Models\Branch;
 use Modules\Country\App\Models\Country;
 use Modules\Rank\App\Models\Rank;
 use Modules\Referrer\App\Models\Referrer;
+use Modules\Role\App\resources\RoleResource;
 use Modules\User\App\Http\Requests\CreateUserRequest;
 use Modules\User\App\Models\User;
 use Modules\User\App\resources\UserCollection;
@@ -115,7 +117,8 @@ class UserController extends Controller
         $users = $this->service->getPaginated();
         return UserResource::collection($users);
     }
-    public function userRole($role_id, Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+
+    public function indexByRoleName($role, Request $request): JsonResponse
     {
         $filters = $request->only([
             'name',
@@ -127,9 +130,21 @@ class UserController extends Controller
             'rank_id',
             'branch_id'
         ]);
-
-        $users = $this->service->getUserRole($role_id, $filters);
-        return UserResource::collection($users);
+        $filters = $request->only([
+            'name',
+            'email',
+            'phone',
+            'status',
+            'zone_id',
+            'city_id',
+            'rank_id',
+            'branch_id'
+        ]);
+        $data = $this->service->paginateUsersByRoleName($role, $filters);
+        return response()->json([
+            'role' => new RoleResource($data['role']),
+            'users' => UserResource::collection($data['users'])->response()->getData(true),
+        ]);
     }
 
     /**
@@ -181,6 +196,11 @@ class UserController extends Controller
         return new UserResource($user);
     }
 
+    public function findByRole()
+    {
+        $users = $this->service->getUsersByRole();
+        return UserResource::collection($users);
+    }
     /**
      * Create a new user
      *
@@ -237,7 +257,6 @@ class UserController extends Controller
      */
     public function store(CreateUserRequest $request): UserResource
     {
-
         $user = $this->service->create($request->validated());
         return new UserResource($user);
     }
@@ -611,7 +630,6 @@ class UserController extends Controller
     public function toggle_status($id): UserResource|\Illuminate\Http\JsonResponse
     {
         $user = $this->service->getById($id);
-
         if (!$user) {
             return response()->json(['error' => 'Not found'], 404);
         }

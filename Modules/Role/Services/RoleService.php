@@ -2,7 +2,7 @@
 
 namespace Modules\Role\Services;
 
-use Modules\Role\App\Models\Role;
+use Spatie\Permission\Models\Role;
 use Modules\Role\Repositories\RoleRepository;
 
 class RoleService
@@ -32,6 +32,11 @@ class RoleService
     public function getById(int $id, array $with = [])
     {
         return $this->repo->find($id, $with);
+    }
+
+    public function findByName(string $name): Role
+    {
+        return $this->repo->findByName($name);
     }
 
     public function create(array $data)

@@ -9,12 +9,14 @@ class UserRepository
     {
         return User::with(['role', 'zone', 'city', 'rank', 'referrer', 'branch', 'parent'])->get();
     }
-    public function userRole($role_id, array $filters = [], int $perPage = 15): LengthAwarePaginator
-    {
-        $query = User::with(['role', 'zone', 'city', 'rank', 'referrer', 'branch', 'parent'])
-            ->where('role_id', $role_id);
 
-        // Apply filters
+    public function getAllUsersByRoleWithPaginate($role, $perPage= 15)
+    {
+            dd($role);
+    }
+    public function getUsersByRoleName($role, array $filters = [], int $perPage = 2): LengthAwarePaginator
+    {
+        $query = User::with(['role', 'zone', 'city', 'rank', 'referrer', 'branch', 'parent'])->where('role_id',$role->id);
         foreach ($filters as $field => $value) {
             if (empty($value)) continue;
 
@@ -72,7 +74,7 @@ class UserRepository
 
     public function find(int $id, array $with = [])
     {
-        return User::with(['city.country','role'])->findOrFail($id);
+        return User::with(['city.country','role','parent'])->findOrFail($id);
     }
 
     public function findTrashedById(int $id)

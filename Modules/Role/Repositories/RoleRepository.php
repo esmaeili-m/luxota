@@ -25,6 +25,11 @@ class RoleRepository
         return Role::with($with)->findOrFail($id);
     }
 
+    public function findByName(string $name): Role
+    {
+        return Role::where('name', $name)->firstOrFail();
+    }
+
     public function findTrashedById(int $id)
     {
         return Role::withTrashed()->find($id);

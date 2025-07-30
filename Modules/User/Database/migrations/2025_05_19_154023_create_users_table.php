@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('phone')->unique();
             $table->text('description')->nullable();
             $table->text('avatar')->nullable();
-            $table->json('website')->nullable();
+            $table->json('websites')->nullable();
             $table->string('remember_token')->nullable();
             $table->string('address')->nullable();
             $table->string('luxota_website')->nullable();

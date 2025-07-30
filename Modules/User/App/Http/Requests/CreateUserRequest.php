@@ -19,7 +19,7 @@ class CreateUserRequest extends FormRequest
             'phone' => 'string|unique:users,phone,' . $userId,
             'description' => 'nullable|string',
             'avatar' => 'nullable',
-            'website' => 'nullable|array',
+            'websites' => 'nullable',
             'address' => 'nullable|string|max:255',
             'luxota_website' => 'nullable|string|max:255',
             'status' => 'boolean',

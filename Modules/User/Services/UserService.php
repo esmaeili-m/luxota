@@ -3,16 +3,20 @@
 namespace Modules\User\Services;
 
 use App\Services\Uploader;
+use Modules\Role\Services\RoleService;
 use Modules\User\App\Models\User;
 use Modules\User\Repositories\UserRepository;
 
 class UserService
 {
     protected UserRepository $repo;
+    protected RoleService $roleService;
 
-    public function __construct(UserRepository $repo)
+    public function __construct(UserRepository $repo,RoleService $roleService)
     {
         $this->repo = $repo;
+        $this->roleService = $roleService;
+
     }
 
     public function getPaginated(int $perPage = 15): \Illuminate\Pagination\LengthAwarePaginator
@@ -24,9 +28,14 @@ class UserService
     {
         return $this->repo->all();
     }
-    public function getUserRole(int $role_id, array $filters = []): \Illuminate\Pagination\LengthAwarePaginator
+    public function paginateUsersByRoleName(string $role, array $filters = [])
     {
-        return $this->repo->userRole($role_id, $filters);
+        $role = $this->roleService->findByName($role);
+        $users = $this->repo->getUsersByRoleName($role, $filters);
+        return [
+            'role' => $role,
+            'users' => $users,
+        ];
     }
 
     public function getTrashedUsers(): \Illuminate\Database\Eloquent\Collection
@@ -39,8 +48,15 @@ class UserService
         return $this->repo->find($id, $with);
     }
 
+    public function getUsersByRole(string $role)
+    {
+        return $this->repo->getAllUsersByRoleWithPaginate($role);
+
+    }
+
     public function create(array $data)
     {
+
         if (isset($data['avatar'])) {
             $data['avatar'] = Uploader::uploadImage($data['avatar'], 'users');
         }

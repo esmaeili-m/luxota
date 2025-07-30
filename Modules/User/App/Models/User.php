@@ -24,7 +24,7 @@ class User extends Authenticatable
         'phone',
         'description',
         'avatar',
-        'website',
+        'websites',
         'address',
         'luxota_website',
         'status',
@@ -54,7 +54,6 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
-        'website' => 'array',
     ];
 
     /**
