@@ -41,7 +41,7 @@ class UserResource extends JsonResource
             'role' => $this->whenLoaded('role', function () {
                 return [
                     'id' => $this->role->id,
-                    'title' => $this->role->title,
+                    'name' => $this->role->name,
                 ];
             }),
             'zone' => $this->whenLoaded('zone', function () {
