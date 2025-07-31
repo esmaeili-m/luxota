@@ -9,7 +9,7 @@ class CountryRepository
 {
     public function all(): \Illuminate\Database\Eloquent\Collection
     {
-        return Country::orderBy('en')->where('phone_code','')->get();
+        return Country::orderBy('en')->whereNot('phone_code','')->get();
     }
 
     public function getActive(): \Illuminate\Database\Eloquent\Collection

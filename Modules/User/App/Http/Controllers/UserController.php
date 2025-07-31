@@ -34,27 +34,51 @@ class UserController extends Controller
         $this->service = $service;
     }
 
+    /**
+     * Get user form data
+     *
+     * @OA\Get(
+     *     path="/api/v1/users/form-data",
+     *     tags={"Users"},
+     *     summary="Get user form data",
+     *     description="Returns form data required for creating/editing users including roles, zones, cities, ranks, etc.",
+     *     operationId="getUserFormData",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="roles", type="array", @OA\Items(type="object")),
+     *             @OA\Property(property="zones", type="array", @OA\Items(type="object")),
+     *             @OA\Property(property="cities", type="array", @OA\Items(type="object")),
+     *             @OA\Property(property="ranks", type="array", @OA\Items(type="object")),
+     *             @OA\Property(property="branches", type="array", @OA\Items(type="object")),
+     *             @OA\Property(property="referrers", type="array", @OA\Items(type="object")),
+     *             @OA\Property(property="countries", type="array", @OA\Items(type="object"))
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated"
+     *     )
+     * )
+     */
     public function UserFormData()
     {
-        return response()->json([
-            'roles' => Role::where('status',1)->pluck('name','id'),
-            'countries' => Country::where('status',1)->whereNot('phone_code','=','')->pluck('phone_code','id'),
-            'zones' => Zone::where('status',1)->pluck('title', 'id'),
-            'ranks' => Rank::where('status',1)->pluck('title','id'),
-            'referrers' => Referrer::where('status',1)->pluck('title','id'),
-            'branches' => Branch::where('status',1)->pluck('title','id'),
-            'parents' => User::where('status',1)->where('role_id',1)->whereNull('parent_id')->select('name','email','id')->get(),
-        ]);
+        return response()->json(
+            $this->service->getFormData()
+        );
     }
+
     /**
      * Get all users
      *
      * @OA\Get(
-     *     path="/api/v1/users",
+     *     path="/api/v1/users/all",
      *     tags={"Users"},
-     *     summary="Get list of users",
-     *     description="Returns a list of users",
-     *     operationId="getUsers",
+     *     summary="Get all users",
+     *     description="Returns a complete list of all users without pagination",
+     *     operationId="getAllUsers",
      *     @OA\Response(
      *         response=200,
      *         description="Successful operation",
@@ -83,13 +107,20 @@ class UserController extends Controller
      *     tags={"Users"},
      *     summary="Get list of users with pagination",
      *     description="Returns a paginated list of users",
-     *     operationId="getUsers",
+     *     operationId="getUsersPaginated",
      *     @OA\Parameter(
      *         name="page",
      *         in="query",
      *         required=false,
      *         @OA\Schema(type="integer", example=1),
      *         description="Page number"
+     *     ),
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         required=false,
+     *         @OA\Schema(type="integer", example=15),
+     *         description="Number of items per page"
      *     ),
      *     @OA\Response(
      *         response=200,
@@ -103,7 +134,8 @@ class UserController extends Controller
      *             ),
      *             @OA\Property(property="current_page", type="integer"),
      *             @OA\Property(property="last_page", type="integer"),
-     *             @OA\Property(property="total", type="integer")
+     *             @OA\Property(property="total", type="integer"),
+     *             @OA\Property(property="per_page", type="integer")
      *         )
      *     ),
      *     @OA\Response(
@@ -118,18 +150,110 @@ class UserController extends Controller
         return UserResource::collection($users);
     }
 
+    /**
+     * Get users by role name with pagination
+     *
+     * @OA\Get(
+     *     path="/api/v1/users/by-role/{role}",
+     *     tags={"Users"},
+     *     summary="Get users by role name",
+     *     description="Returns paginated list of users filtered by role name with optional filters",
+     *     operationId="getUsersByRoleName",
+     *     @OA\Parameter(
+     *         name="role",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="string", example="admin"),
+     *         description="Role name to filter users by"
+     *     ),
+     *     @OA\Parameter(
+     *         name="name",
+     *         in="query",
+     *         required=false,
+     *         @OA\Schema(type="string"),
+     *         description="Filter by user name"
+     *     ),
+     *     @OA\Parameter(
+     *         name="email",
+     *         in="query",
+     *         required=false,
+     *         @OA\Schema(type="string"),
+     *         description="Filter by email"
+     *     ),
+     *     @OA\Parameter(
+     *         name="phone",
+     *         in="query",
+     *         required=false,
+     *         @OA\Schema(type="string"),
+     *         description="Filter by phone number"
+     *     ),
+     *     @OA\Parameter(
+     *         name="status",
+     *         in="query",
+     *         required=false,
+     *         @OA\Schema(type="boolean"),
+     *         description="Filter by user status"
+     *     ),
+     *     @OA\Parameter(
+     *         name="zone_id",
+     *         in="query",
+     *         required=false,
+     *         @OA\Schema(type="integer"),
+     *         description="Filter by zone ID"
+     *     ),
+     *     @OA\Parameter(
+     *         name="city_id",
+     *         in="query",
+     *         required=false,
+     *         @OA\Schema(type="integer"),
+     *         description="Filter by city ID"
+     *     ),
+     *     @OA\Parameter(
+     *         name="rank_id",
+     *         in="query",
+     *         required=false,
+     *         @OA\Schema(type="integer"),
+     *         description="Filter by rank ID"
+     *     ),
+     *     @OA\Parameter(
+     *         name="branch_id",
+     *         in="query",
+     *         required=false,
+     *         @OA\Schema(type="integer"),
+     *         description="Filter by branch ID"
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="role", ref="#/components/schemas/Role"),
+     *             @OA\Property(
+     *                 property="users",
+     *                 type="object",
+     *                 @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/User")),
+     *                 @OA\Property(property="current_page", type="integer"),
+     *                 @OA\Property(property="last_page", type="integer"),
+     *                 @OA\Property(property="total", type="integer")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Role not found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error", type="string", example="Role not found")
+     *         )
+     *     )
+     * )
+     */
     public function indexByRoleName($role, Request $request): JsonResponse
     {
-        $filters = $request->only([
-            'name',
-            'email',
-            'phone',
-            'status',
-            'zone_id',
-            'city_id',
-            'rank_id',
-            'branch_id'
-        ]);
         $filters = $request->only([
             'name',
             'email',
@@ -196,6 +320,29 @@ class UserController extends Controller
         return new UserResource($user);
     }
 
+    /**
+     * Get users by current user's role
+     *
+     * @OA\Get(
+     *     path="/api/v1/users/by-role",
+     *     tags={"Users"},
+     *     summary="Get users by current user's role",
+     *     description="Returns list of users filtered by the current authenticated user's role",
+     *     operationId="getUsersByRole",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/User")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated"
+     *     )
+     * )
+     */
     public function findByRole()
     {
         $users = $this->service->getUsersByRole();
@@ -427,6 +574,41 @@ class UserController extends Controller
      *         @OA\Schema(type="boolean"),
      *         description="Filter by status"
      *     ),
+     *     @OA\Parameter(
+     *         name="role_id",
+     *         in="query",
+     *         required=false,
+     *         @OA\Schema(type="integer"),
+     *         description="Filter by role ID"
+     *     ),
+     *     @OA\Parameter(
+     *         name="zone_id",
+     *         in="query",
+     *         required=false,
+     *         @OA\Schema(type="integer"),
+     *         description="Filter by zone ID"
+     *     ),
+     *     @OA\Parameter(
+     *         name="city_id",
+     *         in="query",
+     *         required=false,
+     *         @OA\Schema(type="integer"),
+     *         description="Filter by city ID"
+     *     ),
+     *     @OA\Parameter(
+     *         name="rank_id",
+     *         in="query",
+     *         required=false,
+     *         @OA\Schema(type="integer"),
+     *         description="Filter by rank ID"
+     *     ),
+     *     @OA\Parameter(
+     *         name="branch_id",
+     *         in="query",
+     *         required=false,
+     *         @OA\Schema(type="integer"),
+     *         description="Filter by branch ID"
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Successful operation",
@@ -608,10 +790,7 @@ class UserController extends Controller
      *     @OA\Response(
      *         response=200,
      *         description="Status changed successfully",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="message", type="string", example="Change Status successfully")
-     *         )
+     *         @OA\JsonContent(ref="#/components/schemas/User")
      *     ),
      *     @OA\Response(
      *         response=404,

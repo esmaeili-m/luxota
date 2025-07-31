@@ -10,15 +10,18 @@ class UserRepository
         return User::with(['role', 'zone', 'city', 'rank', 'referrer', 'branch', 'parent'])->get();
     }
 
-    public function getAllUsersByRoleWithPaginate($role, $perPage= 15)
+    public function getParentUsers(): \Illuminate\Database\Eloquent\Collection
     {
-            dd($role);
+        return User::where('status',1)->where('role_id',1)->whereNull('parent_id')->select('name','email','id')->get();
     }
-    public function getUsersByRoleName($role, array $filters = [], int $perPage = 2): LengthAwarePaginator
+
+    public function getUsersByRoleName($role, array $filters = [], int $perPage = 20): LengthAwarePaginator
     {
         $query = User::with(['role', 'zone', 'city', 'rank', 'referrer', 'branch', 'parent'])->where('role_id',$role->id);
+
         foreach ($filters as $field => $value) {
-            if (empty($value)) continue;
+
+            if ($value === null || $value === '') continue;
 
             switch ($field) {
                 case 'name':
