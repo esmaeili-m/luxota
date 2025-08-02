@@ -15,8 +15,8 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'email'    => 'required|email',
-            'password' => 'required',
+            'email' => 'required|email',
+            'password' => 'required'
         ]);
 
         $user = User::where('email', $request->email)->first();
@@ -25,25 +25,37 @@ class AuthController extends Controller
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
 
-        // ایجاد توکن شخصی
-        $token = $user->createToken('api-token')->plainTextToken;
+        auth()->login($user);  
+
+        $user->load('roles', 'permissions');
 
         return response()->json([
-            'access_token' => $token,
-            'token_type'   => 'Bearer',
-            'user'         => $user,
+            'message' => 'Logged in',
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'roles' => $user->getRoleNames(),
+                'permissions' => $user->getAllPermissions()->pluck('name'),
+            ]
         ]);
     }
 
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        auth('web')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
         return response()->json(['message' => 'Logged out']);
     }
 
     public function me(Request $request)
     {
-        return response()->json($request->user());
+        $user = $request->user();
+        return response()->json(['user' => $request->user(),
+            'roles' => $user->getRoleNames(),
+            'permissions' => $user->getAllPermissions()->pluck('name')
+        ]);
     }
 }

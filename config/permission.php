@@ -175,6 +175,13 @@ return [
     // 'wildcard_permission' => Spatie\Permission\WildcardPermission::class,
 
     /* Cache-specific settings */
+    'model_has_permissions' => [
+        'model' => \Modules\User\App\Models\User::class,
+    ],
+
+    'model_has_roles' => [
+        'model' => \Modules\User\App\Models\User::class,
+    ],
 
     'cache' => [
 

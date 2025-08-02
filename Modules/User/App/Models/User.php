@@ -9,37 +9,22 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Modules\User\Database\factories\UserFactory;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
+    use HasRoles;
     use HasFactory, SoftDeletes, HasApiTokens, Notifiable;
-
+    protected $guard_name = 'api';
     /**
      * The attributes that are mass assignable.
      */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'phone',
-        'description',
-        'avatar',
-        'websites',
-        'address',
-        'luxota_website',
-        'status',
-        'country_code',
-        'whatsapp_country_code',
-        'whatsapp_number',
-        'role_id',
-        'zone_id',
-        'city_id',
-        'rank_id',
-        'referrer_id',
-        'branch_id',
-        'parent_id'
-    ];
-
+    protected $guarded = [];
+    public function getDefaultGuardName(): string
+    {
+        return 'api';  // یا هر guard که تو config/auth.php داری برای sanctum تعریف کردی
+    }
     /**
      * The attributes that should be hidden for serialization.
      */
@@ -61,7 +46,7 @@ class User extends Authenticatable
      */
     public function role()
     {
-        return $this->belongsTo(\Modules\Role\App\Models\Role::class);
+        return $this->belongsTo(Role::class);
     }
 
     /**
