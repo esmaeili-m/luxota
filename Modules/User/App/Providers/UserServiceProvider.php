@@ -2,7 +2,9 @@
 
 namespace Modules\User\App\Providers;
 
+use App\Observers\RelationLoggerObserver;
 use Illuminate\Support\ServiceProvider;
+use Modules\User\App\Models\User;
 
 class UserServiceProvider extends ServiceProvider
 {
@@ -11,6 +13,7 @@ class UserServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+
         $this->app->bind(
             \Modules\User\Repositories\UserRepository::class,
             \Modules\User\Repositories\UserRepository::class
@@ -27,5 +30,7 @@ class UserServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+//        User::observe(RelationLoggerObserver::class);
+
     }
 }

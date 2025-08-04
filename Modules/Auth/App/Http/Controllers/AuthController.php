@@ -25,7 +25,7 @@ class AuthController extends Controller
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
 
-        auth()->login($user);  
+        auth()->login($user);
 
         $user->load('roles', 'permissions');
 
