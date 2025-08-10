@@ -23,6 +23,19 @@ class PermissionTableSeeder extends Seeder
             'user.restore',
             'user.trash',
             'user.update',
+            'role.index',
+            'role.create',
+            'role.delete',
+            'role.restore',
+            'role.trash',
+            'role.update',
+            'zone.index',
+            'zone.create',
+            'zone.delete',
+            'zone.restore',
+            'zone.trash',
+            'zone.update',
+
 
         ];
 

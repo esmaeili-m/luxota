@@ -87,4 +87,4 @@ class ZoneService
         $this->repo->update($zone, ['status' => $newStatus]);
         return response()->json(['message' => 'Change Status successfully']);
     }
-} 
+}

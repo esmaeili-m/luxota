@@ -158,8 +158,8 @@ class RoleController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"title"},
-     *             @OA\Property(property="title", type="string", example="Admin"),
+     *             required={"name"},
+     *             @OA\Property(property="name", type="string", example="Admin"),
      *             @OA\Property(property="status", type="boolean", example=true)
      *         )
      *     ),
@@ -208,7 +208,7 @@ class RoleController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             @OA\Property(property="title", type="string", example="Admin"),
+     *             @OA\Property(property="name", type="string", example="Admin"),
      *             @OA\Property(property="status", type="boolean", example=true)
      *         )
      *     ),
@@ -301,11 +301,11 @@ class RoleController extends Controller
      *     description="Search roles by various fields",
      *     operationId="searchRoles",
      *     @OA\Parameter(
-     *         name="title",
+     *         name="name",
      *         in="query",
      *         required=false,
      *         @OA\Schema(type="string"),
-     *         description="Search by title"
+     *         description="Search by name"
      *     ),
      *     @OA\Parameter(
      *         name="status",
@@ -327,7 +327,7 @@ class RoleController extends Controller
      */
     public function search(Request $request): RoleCollection
     {
-        $filters = $request->only(['title', 'status']);
+        $filters = $request->only(['name', 'status']);
         $roles = $this->service->searchByFields($filters);
         return new RoleCollection($roles);
     }

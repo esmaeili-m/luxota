@@ -7,12 +7,12 @@ class RoleRepository
 {
     public function all(): \Illuminate\Database\Eloquent\Collection
     {
-        return Role::get();
+        return Role::where('status',1)->get();
     }
 
-    public function getTrashedRoles(): \Illuminate\Database\Eloquent\Collection
+    public function getTrashedRoles():LengthAwarePaginator
     {
-        return Role::onlyTrashed()->get();
+        return Role::onlyTrashed()->paginate(15);
     }
 
     public function paginate(int $perPage = 15): LengthAwarePaginator

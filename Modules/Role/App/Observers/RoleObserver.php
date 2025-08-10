@@ -50,6 +50,8 @@ class RoleObserver
 
     public function forceDeleted(Role $role): void
     {
-
+        $role->users()->withTrashed()->each(function ($user) {
+            $user->forceDelete();
+        });
     }
 }

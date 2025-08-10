@@ -2,6 +2,7 @@
 
 namespace Modules\Role\Services;
 
+use Illuminate\Pagination\LengthAwarePaginator;
 use Spatie\Permission\Models\Role;
 use Modules\Role\Repositories\RoleRepository;
 
@@ -24,7 +25,7 @@ class RoleService
         return $this->repo->all();
     }
 
-    public function getTrashedRoles(): \Illuminate\Database\Eloquent\Collection
+    public function getTrashedRoles(): \Illuminate\Pagination\LengthAwarePaginator
     {
         return $this->repo->getTrashedRoles();
     }

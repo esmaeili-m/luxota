@@ -44,7 +44,9 @@ class ZoneObserver
     {
         $zone->users()->withTrashed()->each(function ($user) {
             $user->restore();
-        });
+        }
+
+        );
     }
 
     /**
@@ -52,6 +54,8 @@ class ZoneObserver
      */
     public function forceDeleted(Zone $zone): void
     {
-        //
+        $zone->users()->withTrashed()->each(function ($user) {
+            $user->forceDelete();
+        });
     }
 }

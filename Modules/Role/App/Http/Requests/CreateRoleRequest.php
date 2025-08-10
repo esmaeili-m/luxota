@@ -12,7 +12,7 @@ class CreateRoleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required|string|max:255|unique:roles,title,' . $this->route('role'),
+            'name' => 'required|string|max:255|unique:roles,name,' . $this->route('role'),
             'status' => 'boolean',
         ];
     }
@@ -20,10 +20,10 @@ class CreateRoleRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'title.required' => 'The role title is required.',
-            'title.string' => 'The title must be a valid string.',
-            'title.max' => 'The title may not be greater than 255 characters.',
-            'title.unique' => 'This role title already exists.',
+            'name.required' => 'The role title is required.',
+            'name.string' => 'The title must be a valid string.',
+            'name.max' => 'The title may not be greater than 255 characters.',
+            'name.unique' => 'This role title already exists.',
             'status.boolean' => 'The status must be true or false.',
         ];
     }
@@ -35,4 +35,4 @@ class CreateRoleRequest extends FormRequest
     {
         return true;
     }
-} 
+}
