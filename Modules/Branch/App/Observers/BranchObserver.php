@@ -52,6 +52,8 @@ class BranchObserver
      */
     public function forceDeleted(Branch $branch): void
     {
-        //
+        $branch->users()->withTrashed()->each(function ($user) {
+            $user->forceDelete();
+        });
     }
-} 
+}

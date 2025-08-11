@@ -7,7 +7,7 @@ class RankRepository
 {
     public function all(): \Illuminate\Database\Eloquent\Collection
     {
-        return Rank::get();
+        return Rank::where('status',1)->get();
     }
 
     public function getTrashedRanks(): \Illuminate\Database\Eloquent\Collection

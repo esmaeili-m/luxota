@@ -87,4 +87,4 @@ class RankService
         $this->repo->update($rank, ['status' => $newStatus]);
         return response()->json(['message' => 'Change Status successfully']);
     }
-} 
+}

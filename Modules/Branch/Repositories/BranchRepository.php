@@ -7,7 +7,7 @@ class BranchRepository
 {
     public function all(): \Illuminate\Database\Eloquent\Collection
     {
-        return Branch::orderBy('title')->get();
+        return Branch::where('status',1)->get();
     }
 
     public function getTrashedBranches(): \Illuminate\Database\Eloquent\Collection
@@ -76,4 +76,4 @@ class BranchRepository
 
         return $query->get();
     }
-} 
+}

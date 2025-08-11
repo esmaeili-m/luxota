@@ -22,11 +22,49 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->name('api.')->group(function 
 Route::prefix('v1')
     ->name('api.v1.')
     ->group(function () {
-        Route::get('branches/all', [BranchController::class, 'all']);
-        Route::delete('branches/force-delete/{id}', [BranchController::class, 'forceDelete']);
-        Route::post('branches/{id}/restore', [BranchController::class, 'restore']);
-        Route::get('branches/trash', [BranchController::class, 'trash']);
-        Route::post('branches/{id}/toggle-status', [BranchController::class, 'toggle_status']);
-        Route::get('branches/search', [BranchController::class, 'search']);
-        Route::apiResource('branches', BranchController::class)->names('branches');
+
+        // ------------------------------
+        // Branch extra routes
+        // ------------------------------
+        Route::get('branches/all', [BranchController::class, 'all'])
+            ->middleware('permission:branch.index');
+
+        Route::get('branches/trash', [BranchController::class, 'trash'])
+            ->middleware('permission:branch.trash');
+
+        Route::get('branches/search', [BranchController::class, 'search'])
+            ->middleware('permission:branch.index');
+
+        Route::delete('branches/force-delete/{id}', [BranchController::class, 'forceDelete'])
+            ->middleware('permission:branch.delete');
+
+        Route::post('branches/{id}/restore', [BranchController::class, 'restore'])
+            ->middleware('permission:branch.restore');
+
+        Route::post('branches/{id}/toggle-status', [BranchController::class, 'toggle_status'])
+            ->middleware('permission:branch.update');
+
+        // ------------------------------
+        // Branch resource routes
+        // ------------------------------
+        Route::get('branches', [BranchController::class, 'index'])
+            ->name('branches.index')
+            ->middleware('permission:branch.index');
+
+        Route::post('branches', [BranchController::class, 'store'])
+            ->name('branches.store')
+            ->middleware('permission:branch.create');
+
+        Route::get('branches/{branch}', [BranchController::class, 'show'])
+            ->name('branches.show')
+            ->middleware('permission:branch.index');
+
+        Route::put('branches/{branch}', [BranchController::class, 'update'])
+            ->name('branches.update')
+            ->middleware('permission:branch.update');
+
+        Route::delete('branches/{branch}', [BranchController::class, 'destroy'])
+            ->name('branches.destroy')
+            ->middleware('permission:branch.delete');
     });
+

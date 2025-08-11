@@ -7,7 +7,7 @@ class ReferrerRepository
 {
     public function all(): \Illuminate\Database\Eloquent\Collection
     {
-        return Referrer::orderBy('title')->get();
+        return Referrer::where('status',1)->get();
     }
 
     public function getTrashedReferrers(): \Illuminate\Database\Eloquent\Collection
@@ -76,4 +76,4 @@ class ReferrerRepository
 
         return $query->get();
     }
-} 
+}

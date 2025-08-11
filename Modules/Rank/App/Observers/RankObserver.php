@@ -52,6 +52,8 @@ class RankObserver
      */
     public function forceDeleted(Rank $rank): void
     {
-        //
+        $rank->users()->withTrashed()->each(function ($user) {
+            $user->forceDelete();
+        });
     }
-} 
+}

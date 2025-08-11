@@ -52,6 +52,8 @@ class ReferrerObserver
      */
     public function forceDeleted(Referrer $referrer): void
     {
-        //
+        $referrer->users()->withTrashed()->each(function ($user) {
+            $user->forceDelete();
+        });
     }
-} 
+}
