@@ -3,6 +3,7 @@
 namespace Modules\Category\Services;
 
 use App\Services\Uploader;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Str;
 use Modules\Category\App\Models\Category;
 use Modules\Category\Repositories\CategoryRepository;
@@ -30,9 +31,9 @@ class CategoryService
         return $this->repo->getTrashedCategories();
     }
 
-    public function getById(int $id, array $with = [])
+    public function getById(int $id)
     {
-        return $this->repo->find($id, $with);
+        return $this->repo->find($id);
     }
     public function create(array $data)
     {
@@ -109,4 +110,8 @@ class CategoryService
         return $this->repo->update($category, ['status' => $newStatus]);
     }
 
+    public function getChildrenCategory(int $id ,int $perPage= 15): LengthAwarePaginator
+    {
+        return $this->repo->getChildrenCategory($id, $perPage= 15);
+    }
 }

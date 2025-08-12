@@ -492,4 +492,10 @@ class CategoryController extends Controller
         return response()->json(['message' => 'Change Status successfully']);
 
     }
+    public function category_children($id){
+        $data=[];
+        $data['category']= $this->service->getById($id);
+        $data['children']= $this->service->getChildrenCategory($id);
+        return \response()->json($data);
+    }
 }

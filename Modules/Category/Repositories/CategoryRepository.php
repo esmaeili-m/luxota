@@ -7,7 +7,7 @@ class CategoryRepository
 {
     public function all(): \Illuminate\Database\Eloquent\Collection
     {
-        return Category::orderBy('order')->get();
+        return Category::orderBy('order')->where('status',1)->get();
     }
     public function getTrashedCategories(): \Illuminate\Database\Eloquent\Collection
     {
@@ -20,7 +20,7 @@ class CategoryRepository
 
     public function find(int $id, array $with = [])
     {
-        return Category::with($with)->findOrFail($id);
+        return Category::with(['children','parent'])->findOrFail($id);
     }
     public function findTrashedById(int $id)
     {
@@ -87,5 +87,9 @@ class CategoryRepository
         return $query->get();
     }
 
+    public function getChildrenCategory(int $id,int $perPage= 15):LengthAwarePaginator
+    {
+        return Category::where('parent_id',$id)->paginate($perPage);
+    }
 
 }

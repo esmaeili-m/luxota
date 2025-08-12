@@ -29,6 +29,7 @@ Route::prefix('v1')
         Route::get('categories/search', [CategoryController::class, 'search']);
         Route::get('categories/{id}/with-children', [CategoryController::class, 'showWithChildren']);
         Route::get('categories/{id}/with-parent', [CategoryController::class, 'showWithParent']);
+        Route::get('categories/sub-category/{id}', [CategoryController::class, 'category_children']);
         Route::apiResource('categories', CategoryController::class)->names('categories');
 
     });
