@@ -1,0 +1,11 @@
+{
+    "name": "Rank",
+    "alias": "rank",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Rank\\App\\Providers\\RankServiceProvider"
+    ],
+    "files": []
+}

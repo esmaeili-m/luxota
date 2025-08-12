@@ -1,0 +1,16 @@
+{
+    "User": true,
+    "Role": true,
+    "Zone": true,
+    "City": true,
+    "Country": true,
+    "Referrer": true,
+    "Rank": true,
+    "Branch": true,
+    "Category": true,
+    "Permission": true,
+    "Product": true,
+    "Language": true,
+    "Auth": true,
+    "ActivityLog": true
+}

@@ -1,0 +1,31 @@
+{
+    "name": "nwidart/zone",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Zone\\": "",
+            "Modules\\Zone\\App\\": "app/",
+            "Modules\\Zone\\Database\\Factories\\": "database/factories/",
+            "Modules\\Zone\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\Zone\\Tests\\": "tests/"
+        }
+    }
+}

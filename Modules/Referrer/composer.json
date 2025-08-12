@@ -1,0 +1,31 @@
+{
+    "name": "nwidart/referrer",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Referrer\\": "",
+            "Modules\\Referrer\\App\\": "app/",
+            "Modules\\Referrer\\Database\\Factories\\": "database/factories/",
+            "Modules\\Referrer\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\Referrer\\Tests\\": "tests/"
+        }
+    }
+}
