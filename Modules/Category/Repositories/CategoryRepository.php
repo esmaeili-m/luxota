@@ -11,8 +11,9 @@ class CategoryRepository
     }
     public function getTrashedCategories(): \Illuminate\Database\Eloquent\Collection
     {
-        return Category::onlyTrashed()->whereNull('parent_id')->orderBy('order')->get();
+        return Category::onlyTrashed()->orderBy('order')->get();
     }
+
     public function paginate(int $perPage = 15): LengthAwarePaginator
     {
         return Category::whereNull('parent_id')->orderBy('order')->paginate($perPage);
@@ -22,6 +23,7 @@ class CategoryRepository
     {
         return Category::with(['children','parent'])->findOrFail($id);
     }
+
     public function findTrashedById(int $id)
     {
         return Category::withTrashed()->find($id);
@@ -47,6 +49,7 @@ class CategoryRepository
         return $category->restore();
 
     }
+
     public function forceDelete($id)
     {
         $category = Category::onlyTrashed()->findOrFail($id);
@@ -90,6 +93,21 @@ class CategoryRepository
     public function getChildrenCategory(int $id,int $perPage= 15):LengthAwarePaginator
     {
         return Category::where('parent_id',$id)->paginate($perPage);
+    }
+
+    public function getNextCategoryCode()
+    {
+        return Category::max('category_code') + 1;
+    }
+
+    public function getNextOrder()
+    {
+        return Category::max('order') + 1;
+    }
+
+    public function slugExists(string $slug): bool
+    {
+        return Category::where('slug', $slug)->exists();
     }
 
 }

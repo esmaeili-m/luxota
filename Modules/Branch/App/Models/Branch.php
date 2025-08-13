@@ -27,10 +27,10 @@ class Branch extends Model
         return LogOptions::defaults()
             ->logAll()
             ->logOnlyDirty()
-            ->useLogName('referrers')
+            ->useLogName('branches')
             ->setDescriptionForEvent(function(string $eventName) {
                 $userName = auth()->user()?->name ?? 'NOT FOUND';
-                return "Referrer {$eventName} by {$userName}";
+                return "Branch {$eventName} by {$userName}";
             });
     }
     /**

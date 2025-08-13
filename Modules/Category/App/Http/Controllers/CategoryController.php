@@ -468,34 +468,171 @@ class CategoryController extends Controller
         );
     }
 
+    /**
+     * Restore a deleted category
+     * @OA\Patch(
+     *     path="/api/v1/categories/{id}/restore",
+     *     tags={"Categories"},
+     *     summary="Restore a soft-deleted category",
+     *     description="Restores a category that was previously soft-deleted",
+     *     operationId="restoreCategory",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID of the category to restore",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Category restored successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Category restored successfully")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Category not found"
+     *     )
+     * )
+     */
     public function restore($id)
     {
         $this->service->restoreCategory($id);
-
         return response()->json(['message' => 'Category restored successfully']);
     }
+
+    /**
+     * Permanently delete a category
+     * @OA\Delete(
+     *     path="/api/v1/categories/{id}/force",
+     *     tags={"Categories"},
+     *     summary="Permanently delete a category",
+     *     description="Deletes a category permanently from the database",
+     *     operationId="forceDeleteCategory",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID of the category to permanently delete",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Category permanently deleted",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Category permanently deleted")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Category not found"
+     *     )
+     * )
+     */
     public function forceDelete($id)
     {
         $this->service->forceDeleteCategory($id);
-
         return response()->json(['message' => 'Category permanently deleted']);
     }
 
+    /**
+     * List trashed categories
+     * @OA\Get(
+     *     path="/api/v1/categories/trash",
+     *     tags={"Categories"},
+     *     summary="List soft-deleted categories",
+     *     description="Returns a list of categories that are soft-deleted (in trash)",
+     *     operationId="getTrashedCategories",
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of trashed categories",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/Category")
+     *         )
+     *     )
+     * )
+     */
     public function trash()
     {
         $categories = $this->service->getTrashedCategories();
         return CategoryResource::collection($categories);
     }
+
+    /**
+     * Toggle category status
+     * @OA\Patch(
+     *     path="/api/v1/categories/{id}/toggle-status",
+     *     tags={"Categories"},
+     *     summary="Toggle category active/inactive status",
+     *     description="Changes the status of a category between active and inactive",
+     *     operationId="toggleCategoryStatus",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID of the category to toggle status",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=5)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Status changed successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Change Status successfully")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Category not found"
+     *     )
+     * )
+     */
     public function toggle_status($id)
     {
-        $category = $this->service->toggle_status($id);
+        $this->service->toggle_status($id);
         return response()->json(['message' => 'Change Status successfully']);
-
     }
-    public function category_children($id){
-        $data=[];
-        $data['category']= $this->service->getById($id);
-        $data['children']= $this->service->getChildrenCategory($id);
-        return \response()->json($data);
+
+    /**
+     * Get category with its children
+     * @OA\Get(
+     *     path="/api/v1/categories/{id}/children",
+     *     tags={"Categories"},
+     *     summary="Get a category and its children",
+     *     description="Returns the specified category and a list of its child categories",
+     *     operationId="getCategoryChildren",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID of the parent category",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=3)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Category and children data",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="category", ref="#/components/schemas/Category"),
+     *             @OA\Property(
+     *                 property="children",
+     *                 type="array",
+     *                 @OA\Items(ref="#/components/schemas/Category")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Category not found"
+     *     )
+     * )
+     */
+    public function category_children($id)
+    {
+        $data = [];
+        $data['category'] = $this->service->getById($id);
+        $data['children'] = $this->service->getChildrenCategory($id);
+        return response()->json($data);
     }
 }

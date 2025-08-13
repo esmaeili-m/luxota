@@ -26,6 +26,7 @@ class CategoryService
     {
         return $this->repo->all();
     }
+
     public function getTrashedCategories(): \Illuminate\Database\Eloquent\Collection
     {
         return $this->repo->getTrashedCategories();
@@ -35,6 +36,7 @@ class CategoryService
     {
         return $this->repo->find($id);
     }
+
     public function create(array $data)
     {
         if (isset($data['image'])) {
@@ -42,12 +44,16 @@ class CategoryService
         }
         if (empty($data['slug'])) {
             $data['slug'] = Str::slug($data['title']['en']);
+            if ($this->repo->slugExists($data['slug'])) {
+                $data['slug'] = $this->generateUniqueSlug($data['slug']);
+            }
         }
         if (empty($data['category_code'])) {
-            $data['category_code'] = Category::max('category_code')+1;
+            $data['category_code'] = $this->repo->getNextCategoryCode();
         }
+
         if (empty($data['order'])) {
-            $data['order'] = Category::max('order') + 1;
+            $data['order'] = $this->repo->getNextOrder();
         }
         return $this->repo->create($data);
     }
@@ -71,7 +77,6 @@ class CategoryService
         return $category->fresh();
     }
 
-
     public function delete(int $id): bool
     {
         $category = $this->repo->find($id);
@@ -80,12 +85,14 @@ class CategoryService
         }
         return $category->delete();
     }
+
     public function destroy($id)
     {
         $this->service->deleteCategory($id);
 
         return response()->json(['message' => 'Category soft deleted successfully']);
     }
+
     public function searchByFields(array $filters): \Illuminate\Database\Eloquent\Collection|array
     {
         return $this->repo->searchByFields($filters);
@@ -99,10 +106,12 @@ class CategoryService
         }
         $this->repo->restore($category);
     }
+
     public function forceDeleteCategory($id)
     {
         $this->repo->forceDelete($id);
     }
+
     public function toggle_status($id)
     {
         $category = $this->repo->find($id);
@@ -114,4 +123,18 @@ class CategoryService
     {
         return $this->repo->getChildrenCategory($id, $perPage= 15);
     }
+
+    protected function generateUniqueSlug($slug)
+    {
+        $originalSlug = $slug;
+        $counter = 1;
+
+        while ($this->repo->slugExists($slug)) {
+            $slug = $originalSlug . '-' . $counter;
+            $counter++;
+        }
+
+        return $slug;
+    }
+
 }
