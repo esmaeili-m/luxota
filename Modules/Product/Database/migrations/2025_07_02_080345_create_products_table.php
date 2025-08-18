@@ -16,7 +16,7 @@ return new class extends Migration
             $table->json('title');
             $table->json('description');
             $table->bigInteger('product_code')->default(10);
-            $table->dateTime('last_version_update_date');
+            $table->dateTime('last_version_update_date')->default(\Illuminate\Support\Facades\DB::raw('CURRENT_TIMESTAMP'));;
             $table->float('version')->nullable();
             $table->text('image')->nullable();
             $table->text('video_script')->nullable();

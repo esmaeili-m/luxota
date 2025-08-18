@@ -38,45 +38,28 @@ class ProductService
 
     public function create(array $data)
     {
-        // Handle image upload if it's a file
         if (isset($data['image']) && is_file($data['image'])) {
             $data['image'] = Uploader::uploadImage($data['image'], 'products');
         }
-        
-        // Generate slug if not provided
+
         if (empty($data['slug'])) {
             $data['slug'] = Str::slug($data['title']['en']);
+            if ($this->repo->slugExists($data['slug'])) {
+                $data['slug'] = $this->generateUniqueSlug($data['slug']);
+            }
         }
-        
-        // Set default values for required fields
+
+        if (empty($data['product_code'])) {
+            $data['product_code'] = $this->repo->getNextProductCode();
+        }
         if (empty($data['last_version_update_date'])) {
             $data['last_version_update_date'] = now();
         }
-        
-        if (empty($data['product_code'])) {
-            $data['product_code'] = Product::max('product_code') + 1;
-        }
-        
+
         if (empty($data['order'])) {
-            $data['order'] = Product::max('order') + 1;
+            $data['order'] = $this->repo->getNextOrder();
         }
-        
-        if (!isset($data['status'])) {
-            $data['status'] = true;
-        }
-        
-        if (!isset($data['show_price'])) {
-            $data['show_price'] = true;
-        }
-        
-        if (!isset($data['payment_type'])) {
-            $data['payment_type'] = true;
-        }
-        
-        if (!isset($data['version'])) {
-            $data['version'] = 1.0;
-        }
-        
+
         return $this->repo->create($data);
     }
 
@@ -88,7 +71,6 @@ class ProductService
             return null;
         }
 
-        // Handle image upload if it's a file
         if (isset($data['image']) && is_file($data['image'])) {
             if ($product->image) {
                 Uploader::deleteImage($product->image);
@@ -96,24 +78,8 @@ class ProductService
             $data['image'] = Uploader::uploadImage($data['image'], 'products');
         }
 
-        // Generate slug if not provided
-        if (empty($data['slug'])) {
-            $data['slug'] = Str::slug($data['title']['en']);
-        }
-
-        // Ensure order is provided for updates
         if (!isset($data['order'])) {
             $data['order'] = $product->order;
-        }
-        
-        // Ensure product_code is provided for updates
-        if (!isset($data['product_code'])) {
-            $data['product_code'] = $product->product_code;
-        }
-        
-        // Ensure last_version_update_date is provided for updates
-        if (!isset($data['last_version_update_date'])) {
-            $data['last_version_update_date'] = $product->last_version_update_date;
         }
 
         $this->repo->update($product, $data);
@@ -161,5 +127,17 @@ class ProductService
         $product = $this->repo->find($id);
         $newStatus = !$product->status;
         return $this->repo->update($product, ['status' => $newStatus]);
+    }
+    protected function generateUniqueSlug($slug)
+    {
+        $originalSlug = $slug;
+        $counter = 1;
+
+        while ($this->repo->slugExists($slug)) {
+            $slug = $originalSlug . '-' . $counter;
+            $counter++;
+        }
+
+        return $slug;
     }
 }

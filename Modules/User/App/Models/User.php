@@ -126,7 +126,6 @@ class User extends Authenticatable
         return UserFactory::new();
     }
 
-    // تنظیمات لاگ
 
     public function getActivitylogOptions(): LogOptions
     {

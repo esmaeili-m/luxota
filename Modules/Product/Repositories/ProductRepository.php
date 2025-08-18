@@ -11,12 +11,12 @@ class ProductRepository
     {
         return Product::with('category')->get();
     }
-    
+
     public function getTrashedProducts(): \Illuminate\Database\Eloquent\Collection
     {
         return Product::onlyTrashed()->with('category')->get();
     }
-    
+
     public function paginate(int $perPage = 15): LengthAwarePaginator
     {
         return Product::with('category')->orderBy('order')->paginate($perPage);
@@ -26,7 +26,7 @@ class ProductRepository
     {
         return Product::with($with)->findOrFail($id);
     }
-    
+
     public function findTrashedById(int $id)
     {
         return Product::withTrashed()->find($id);
@@ -51,7 +51,7 @@ class ProductRepository
     {
         return $product->restore();
     }
-    
+
     public function forceDelete($id)
     {
         $product = Product::onlyTrashed()->findOrFail($id);
@@ -117,5 +117,20 @@ class ProductRepository
         }
 
         return $query->get();
+    }
+
+    public function getNextProductCode()
+    {
+        return Product::max('product_code') + 1;
+    }
+
+    public function getNextOrder()
+    {
+        return Product::max('order') + 1;
+    }
+
+    public function slugExists(string $slug): bool
+    {
+        return Product::where('slug', $slug)->exists();
     }
 }

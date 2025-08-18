@@ -22,12 +22,52 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->name('api.')->group(function 
 Route::prefix('v1')
     ->name('api.v1.')
     ->group(function () {
-        Route::get('products/all', [ProductController::class, 'all']);
-        Route::delete('/products/force-delete/{id}', [ProductController::class, 'forceDelete']);
-        Route::post('/products/{id}/restore', [ProductController::class, 'restore']);
-        Route::get('products/trash', [ProductController::class, 'trash']);
-        Route::post('products/{id}/toggle-status', [ProductController::class, 'toggle_status']);
-        Route::get('products/search', [ProductController::class, 'search']);
-        Route::get('products/{id}/with-category', [ProductController::class, 'showWithCategory']);
-        Route::apiResource('products', ProductController::class)->names('products');
+
+        // ------------------------------
+        // Product extra routes
+        // ------------------------------
+        Route::get('products/all', [ProductController::class, 'all'])
+            ->middleware('permission:product.index');
+
+        Route::get('products/trash', [ProductController::class, 'trash'])
+            ->middleware('permission:product.trash');
+
+        Route::get('products/search', [ProductController::class, 'search'])
+            ->middleware('permission:product.index');
+
+        Route::delete('products/force-delete/{id}', [ProductController::class, 'forceDelete'])
+            ->middleware('permission:product.delete');
+
+        Route::post('products/{id}/restore', [ProductController::class, 'restore'])
+            ->middleware('permission:product.restore');
+
+        Route::post('products/{id}/toggle-status', [ProductController::class, 'toggle_status'])
+            ->middleware('permission:product.update');
+
+        Route::get('products/{id}/with-category', [ProductController::class, 'showWithCategory'])
+            ->middleware('permission:product.index');
+
+        // ------------------------------
+        // Product resource routes
+        // ------------------------------
+        Route::get('products', [ProductController::class, 'index'])
+            ->name('products.index')
+            ->middleware('permission:product.index');
+
+        Route::post('products', [ProductController::class, 'store'])
+            ->name('products.store')
+            ->middleware('permission:product.create');
+
+        Route::get('products/{product}', [ProductController::class, 'show'])
+            ->name('products.show')
+            ->middleware('permission:product.index');
+
+        Route::put('products/{product}', [ProductController::class, 'update'])
+            ->name('products.update')
+            ->middleware('permission:product.update');
+
+        Route::delete('products/{product}', [ProductController::class, 'destroy'])
+            ->name('products.destroy')
+            ->middleware('permission:product.delete');
     });
+

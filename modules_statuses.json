@@ -12,5 +12,6 @@
     "Product": true,
     "Language": true,
     "Auth": true,
-    "ActivityLog": true
+    "ActivityLog": true,
+    "Price": true
 }

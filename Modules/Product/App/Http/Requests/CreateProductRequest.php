@@ -20,18 +20,39 @@ class CreateProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required|array',
-            'title.en' => 'required|string|max:255',
-            'title.fa' => 'required|string|max:255',
-            'description' => 'required|array',
-            'description.en' => 'required|string',
-            'description.fa' => 'required|string',
+            'title' => 'required|min:1',
+            'title.*' => 'string|max:255',
+            'description.*' => 'required|max:500',
+            'description' => [
+                'required',
+                function ($attribute, $value, $fail) {
+                    if (!is_array($value)) return;
+                    $titleArray = $this->input('title');
+                    $titleKeys = collect(array_keys($titleArray));
+                    $subtitleKeys = collect(array_keys($value));
+                    $missingInSubtitle = $titleKeys->diff($subtitleKeys);
+                    $extraInSubtitle = $subtitleKeys->diff($titleKeys);
+
+                    if ($missingInSubtitle->isNotEmpty() || $extraInSubtitle->isNotEmpty()) {
+                        $message = [];
+
+                        if ($missingInSubtitle->isNotEmpty()) {
+                            $message[] = "Missing languages in description: " . $missingInSubtitle->join(', ');
+                        }
+
+                        if ($extraInSubtitle->isNotEmpty()) {
+                            $message[] = "Extra languages in description: " . $extraInSubtitle->join(', ');
+                        }
+
+                        $fail(implode('. ', $message));
+                    }
+                },
+            ],
             'product_code' => 'nullable|integer|min:1',
             'last_version_update_date' => 'nullable|date',
             'version' => 'nullable|numeric|min:0',
-            'image' => 'nullable|string',
+            'image' => 'required',
             'video_script' => 'nullable|string',
-            'slug' => 'nullable|string|max:255|unique:products,slug',
             'order' => 'nullable|integer|min:1',
             'show_price' => 'nullable|boolean',
             'payment_type' => 'nullable|boolean',
@@ -63,4 +84,4 @@ class CreateProductRequest extends FormRequest
             'category_id.exists' => 'Selected category does not exist.',
         ];
     }
-} 
+}

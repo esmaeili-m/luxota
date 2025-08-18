@@ -2,32 +2,35 @@
 
 namespace Modules\Product\App\Models;
 
+use App\Traits\LogsRelations;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Category\App\Models\Category;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Models\Activity;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Product extends Model
 {
     use HasFactory, SoftDeletes;
+    use LogsActivity,LogsRelations;
 
     protected $guarded = [];
 
-    protected $fillable = [
-        'title',
-        'description',
-        'product_code',
-        'last_version_update_date',
-        'version',
-        'image',
-        'video_script',
-        'slug',
-        'order',
-        'show_price',
-        'payment_type',
-        'status',
-        'category_id',
-    ];
+    protected static $recordEvents = ['created', 'updated', 'deleted', 'restored', 'forceDeleted'];
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll()
+            ->logOnlyDirty()
+            ->useLogName('products')
+            ->setDescriptionForEvent(function(string $eventName) {
+                $userName = auth()->user()?->name ?? 'NOT FOUND';
+                return "Product {$eventName} by {$userName}";
+            });
+    }
 
     protected $casts = [
         'title' => 'array',
@@ -39,20 +42,45 @@ class Product extends Model
         'payment_type' => 'boolean',
         'order' => 'integer',
     ];
+    protected array $loggableRelations = [
+        'category_id' => [
+            'model' => Category::class,
+            'key' => 'title',
+            'label' => 'categor',
+        ],
+    ];
 
     public function category()
     {
         return $this->belongsTo(Category::class);
     }
 
-    protected static function booted()
+    public function tapActivity(Activity $activity, string $eventName)
     {
-        static::deleting(function ($product) {
-            // Handle any product-specific deletion logic if needed
-        });
+        $newAttributes = $activity->properties['attributes'] ?? [];
+        $oldAttributes = $activity->properties['old'] ?? [];
 
-        static::restoring(function ($product) {
-            // Handle any product-specific restoration logic if needed
-        });
+        $relationChanges = $this->getRelatedChanges();
+
+        foreach ($relationChanges as $label => $change) {
+            if (!is_array($change) || !array_key_exists('old', $change)) {
+                continue;
+            }
+
+            $oldAttributes[$label] = $change['old'];
+            $newAttributes[$label] = $change['new'];
+        }
+
+        // فقط attributes و old رو بازنویسی کن، بقیه ساختار دست نخورده
+        $activity->properties = collect([
+            'attributes' => $newAttributes,
+            'old' => $oldAttributes,
+        ]);
     }
+
+    public function getDescriptionForEvent(string $eventName): string
+    {
+        return "product '{$this->name}' was {$eventName} by user ID " . auth()->id();
+    }
+
 }

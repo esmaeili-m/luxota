@@ -60,6 +60,13 @@ class PermissionTableSeeder extends Seeder
             'category.trash',
             'category.update',
             'category.price',
+            'product.index',
+            'product.create',
+            'product.delete',
+            'product.restore',
+            'product.trash',
+            'product.update',
+            'product.price',
         ];
         foreach ($permissions as $perm) {
             Permission::firstOrCreate(['name' => $perm, 'guard_name' => 'api']);

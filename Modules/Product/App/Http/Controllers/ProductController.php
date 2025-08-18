@@ -251,13 +251,13 @@ class ProductController extends Controller
     public function store(CreateProductRequest $request): ProductResource
     {
         $data = $request->validated();
-        
+
         // Transform the data structure for multilingual fields
         $data['title'] = [
             'en' => $data['title']['en'],
             'fa' => $data['title']['fa']
         ];
-        
+
         $data['description'] = [
             'en' => $data['description']['en'],
             'fa' => $data['description']['fa']
@@ -335,17 +335,6 @@ class ProductController extends Controller
     public function update($id, UpdateProductRequest $request): ProductResource|\Illuminate\Http\JsonResponse
     {
         $data = $request->validated();
-        
-        // Transform the data structure for multilingual fields
-        $data['title'] = [
-            'en' => $data['title']['en'],
-            'fa' => $data['title']['fa']
-        ];
-        
-        $data['description'] = [
-            'en' => $data['description']['en'],
-            'fa' => $data['description']['fa']
-        ];
 
         $product = $this->service->update($id, $data);
 
@@ -507,12 +496,7 @@ class ProductController extends Controller
      */
     public function restore($id)
     {
-        $restored = $this->service->restoreProduct($id);
-        
-        if (!$restored) {
-            return response()->json(['error' => 'Not found'], 404);
-        }
-        
+        $this->service->restoreProduct($id);
         return response()->json(['message' => 'Product restored successfully']);
     }
 
@@ -630,11 +614,11 @@ class ProductController extends Controller
     public function toggle_status($id)
     {
         $toggled = $this->service->toggle_status($id);
-        
+
         if (!$toggled) {
             return response()->json(['error' => 'Not found'], 404);
         }
-        
+
         return response()->json(['message' => 'Status toggled successfully']);
     }
 }
