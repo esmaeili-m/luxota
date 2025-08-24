@@ -1,0 +1,31 @@
+{
+    "name": "nwidart/accountingfinance",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\AccountingFinance\\": "",
+            "Modules\\AccountingFinance\\App\\": "app/",
+            "Modules\\AccountingFinance\\Database\\Factories\\": "database/factories/",
+            "Modules\\AccountingFinance\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\AccountingFinance\\Tests\\": "tests/"
+        }
+    }
+}

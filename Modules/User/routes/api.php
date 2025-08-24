@@ -37,8 +37,7 @@ Route::prefix('v1')
             ->middleware('permission:user.create');
 
         Route::post('users/user-role/{role}', [UserController::class, 'indexByRoleName'])
-            ->name('users.index_by_role')
-            ;
+            ->name('users.index_by_role');
 
         Route::delete('users/force-delete/{id}', [UserController::class, 'forceDelete'])
             ->name('users.force_delete')

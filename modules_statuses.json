@@ -13,5 +13,6 @@
     "Language": true,
     "Auth": true,
     "ActivityLog": true,
-    "Price": true
+    "Price": true,
+    "AccountingFinance": true
 }

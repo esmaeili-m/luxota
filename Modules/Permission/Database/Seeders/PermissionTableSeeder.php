@@ -67,6 +67,10 @@ class PermissionTableSeeder extends Seeder
             'product.trash',
             'product.update',
             'product.price',
+            'voucher.index',
+            'voucher.create',
+            'voucher.delete',
+            'voucher.update',
         ];
         foreach ($permissions as $perm) {
             Permission::firstOrCreate(['name' => $perm, 'guard_name' => 'api']);

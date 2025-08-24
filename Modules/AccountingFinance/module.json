@@ -1,0 +1,11 @@
+{
+    "name": "AccountingFinance",
+    "alias": "accountingfinance",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\AccountingFinance\\App\\Providers\\AccountingFinanceServiceProvider"
+    ],
+    "files": []
+}
