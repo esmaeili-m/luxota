@@ -9,6 +9,7 @@ use Illuminate\Http\Response;
 use Modules\Category\App\Http\Requests\CreateCategoryRequest;
 use Modules\Category\App\resources\CategoryCollection;
 use Modules\Category\App\resources\CategoryResource;
+use Modules\Category\App\resources\CategoryWithProductsResource;
 use Modules\Category\Services\CategoryService;
 
 /**
@@ -634,5 +635,11 @@ class CategoryController extends Controller
         $data['category'] = $this->service->getById($id);
         $data['children'] = $this->service->getChildrenCategory($id);
         return response()->json($data);
+    }
+
+    public function find_by_slug($slug):CategoryWithProductsResource
+    {
+        $data = $this->service->getCategoryWithProducts($slug);
+        return new CategoryWithProductsResource($data);
     }
 }

@@ -43,6 +43,24 @@ class CategoryResource extends JsonResource
                     ];
                 });
             }),
+            'products' => $this->whenLoaded('products', function () {
+                return $this->children->map(function ($product) {
+                    return [
+                        'id'          => $product->id,
+                        'title'       => $product->title,
+                        'description' => $product->description,
+                        'product_code' => $product->product_code,
+                        'last_version_update_date' => $this->last_version_update_date?->format('Y-m-d H:i:s'),
+                        'version'     => $product->version,
+                        'image'       => $product->image,
+                        'video_script' => $product->video_script,
+                        'slug'        => $product->slug,
+                        'order'       => $product->order,
+                        'show_price'  => $product->show_price,
+                        'payment_type' => $product->payment_type,
+                    ];
+                });
+            }),
         ];
     }
 }

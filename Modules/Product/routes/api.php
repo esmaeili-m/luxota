@@ -35,6 +35,8 @@ Route::prefix('v1')
         Route::get('products/search', [ProductController::class, 'search'])
             ->middleware('permission:product.index');
 
+        Route::get('products/findBySlug/{slug}', [ProductController::class, 'find_by_slug']);
+
         Route::delete('products/force-delete/{id}', [ProductController::class, 'forceDelete'])
             ->middleware('permission:product.delete');
 
@@ -69,5 +71,19 @@ Route::prefix('v1')
         Route::delete('products/{product}', [ProductController::class, 'destroy'])
             ->name('products.destroy')
             ->middleware('permission:product.delete');
+    });
+
+Route::prefix('v1')
+    ->name('api.v1.')
+    ->group(function () {
+
+        // ------------------------------
+        // Product extra routes
+        // ------------------------------
+        Route::get('cmments/all', [ProductController::class, 'all'])
+            ->middleware('permission:product.index');
+
+        Route::post('comments', [\Modules\Product\App\Http\Controllers\CommentController::class, 'store']);
+
     });
 

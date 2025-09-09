@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Category\App\Models\Category;
+use Modules\Price\App\Models\Price;
+use Modules\User\App\Models\User;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -50,9 +52,24 @@ class Product extends Model
         ],
     ];
 
+    public function prices()
+    {
+        return $this->hasMany(Price::class);
+    }
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function author()
+    {
+        return $this->hasOne(User::class,'id','author_id');
+
+    }
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+
     }
 
     public function tapActivity(Activity $activity, string $eventName)

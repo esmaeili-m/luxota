@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->json('title');
+            $table->foreignId('author_id')->constrained('users')->cascadeOnDelete()->cascadeOnUpdate();
             $table->json('description');
             $table->bigInteger('product_code')->default(10);
             $table->dateTime('last_version_update_date')->default(\Illuminate\Support\Facades\DB::raw('CURRENT_TIMESTAMP'));;

@@ -137,4 +137,18 @@ class CategoryService
         return $slug;
     }
 
+    public function getBySlug($slug)
+    {
+        return $this->repo->getBySlug($slug);
+
+    }
+    public function getCategoryWithProducts($slug)
+    {
+        $category = $this->repo->getBySlug($slug);
+        $products = $this->repo->getAllProducts($category);
+
+        return compact('category', 'products');
+    }
+
+
 }

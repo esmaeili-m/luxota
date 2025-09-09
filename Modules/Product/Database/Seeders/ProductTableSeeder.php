@@ -76,8 +76,8 @@ class ProductTableSeeder extends Seeder
             $show_price = isset($data['show_price']) ? (bool)$data['show_price'] : true;
             $payment_type = isset($data['payment_type']) ? (bool)$data['payment_type'] : true;
             $version = $data['version'] ?? 1.0;
-            $last_version_update_date = isset($data['last_version_update_date']) 
-                ? Carbon::parse($data['last_version_update_date']) 
+            $last_version_update_date = isset($data['last_version_update_date'])
+                ? Carbon::parse($data['last_version_update_date'])
                 : $createdAt;
 
             $products[] = [
@@ -90,6 +90,7 @@ class ProductTableSeeder extends Seeder
                 'image' => $data['thumbnail'] ?? $data['image'] ?? '',
                 'video_script' => $data['video_script'] ?? null,
                 'slug' => $slug,
+                'author_id' => $data['author_id'],
                 'order' => $order,
                 'show_price' => $show_price,
                 'payment_type' => $payment_type,

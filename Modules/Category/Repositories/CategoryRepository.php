@@ -2,6 +2,7 @@
 namespace Modules\Category\Repositories;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Modules\Category\App\Models\Category;
+use Modules\Product\App\Models\Product;
 
 class CategoryRepository
 {
@@ -110,4 +111,29 @@ class CategoryRepository
         return Category::where('slug', $slug)->exists();
     }
 
+    public function getBySlug($slug)
+    {
+        return Category::where('slug',$slug)->where('status',1)->with(['children' => function($childern){
+            $childern->where('status',1);
+        }])->first();
+    }
+
+    public function getAllProducts(Category $category)
+    {
+        $ids = $this->getAllCategoryIds($category);
+        return Product::whereIn('category_id', $ids)->where('status',1)->with(['category' => function($query){
+            $query->select('id', 'title');
+        }])->get();
+    }
+
+    private function getAllCategoryIds(Category $category)
+    {
+        $ids = [$category->id];
+
+        foreach ($category->children as $child) {
+            $ids = array_merge($ids, $this->getAllCategoryIds($child));
+        }
+
+        return $ids;
+    }
 }

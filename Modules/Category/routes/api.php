@@ -52,12 +52,15 @@ Route::prefix('v1')
         Route::get('categories/sub-category/{id}', [CategoryController::class, 'category_children'])
             ->middleware('permission:category.index');
 
+        Route::get('categories/findBySlug/{slug}', [CategoryController::class, 'find_by_slug']);
+
+
         // ------------------------------
         // Category resource routes
         // ------------------------------
         Route::get('categories', [CategoryController::class, 'index'])
-            ->name('categories.index')
-            ->middleware('permission:category.index');
+            ->name('categories.index');
+
 
         Route::post('categories', [CategoryController::class, 'store'])
             ->name('categories.store')

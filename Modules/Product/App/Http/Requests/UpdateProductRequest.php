@@ -21,7 +21,7 @@ class UpdateProductRequest extends FormRequest
     public function rules(): array
     {
         $productId = $this->route('id');
-        
+
         return [
             'title' => 'required|array',
             'title.en' => 'required|string|max:255',
@@ -32,7 +32,7 @@ class UpdateProductRequest extends FormRequest
             'product_code' => 'nullable|integer|min:1',
             'last_version_update_date' => 'nullable|date',
             'version' => 'nullable|numeric|min:0',
-            'image' => 'nullable|string',
+            'image' => 'nullable',
             'video_script' => 'nullable|string',
             'slug' => [
                 'nullable',
@@ -71,4 +71,4 @@ class UpdateProductRequest extends FormRequest
             'category_id.exists' => 'Selected category does not exist.',
         ];
     }
-} 
+}

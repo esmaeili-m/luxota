@@ -14,5 +14,6 @@
     "Auth": true,
     "ActivityLog": true,
     "Price": true,
-    "AccountingFinance": true
+    "AccountingFinance": true,
+    "Currency": true
 }

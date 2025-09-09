@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use Modules\Product\App\Http\Requests\CreateProductRequest;
 use Modules\Product\App\Http\Requests\UpdateProductRequest;
 use Modules\Product\App\resources\ProductCollection;
@@ -620,5 +621,11 @@ class ProductController extends Controller
         }
 
         return response()->json(['message' => 'Status toggled successfully']);
+    }
+
+    public function find_by_slug(Request $request,$slug):ProductResource
+    {
+        $data = $this->service->getProductBySlug($slug);
+        return new ProductResource($data);
     }
 }

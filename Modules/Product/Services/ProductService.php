@@ -140,4 +140,9 @@ class ProductService
 
         return $slug;
     }
+
+    public function getProductBySlug($slug)
+    {
+        return $this->repo->getBySlug($slug);
+    }
 }

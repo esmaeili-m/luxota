@@ -133,4 +133,9 @@ class ProductRepository
     {
         return Product::where('slug', $slug)->exists();
     }
+
+    public function getBySlug($slug)
+    {
+        return Product::where('slug',$slug)->where('status',1)->with(['category','prices','author.products', 'comments.user', 'comments.comments.user'])->first();
+    }
 }

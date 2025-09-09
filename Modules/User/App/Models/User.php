@@ -10,6 +10,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Modules\Branch\App\Models\Branch;
 use Modules\City\App\Models\City;
+use Modules\Product\App\Models\Product;
 use Modules\Rank\App\Models\Rank;
 use Modules\Referrer\App\Models\Referrer;
 use Modules\User\Database\factories\UserFactory;
@@ -89,6 +90,7 @@ class User extends Authenticatable
         return $this->belongsTo(City::class);
     }
 
+
     public function rank()
     {
         return $this->belongsTo(Rank::class);
@@ -117,6 +119,10 @@ class User extends Authenticatable
     public function referredUsers()
     {
         return $this->hasMany(self::class, 'referrer_id');
+    }
+    public function products()
+    {
+        return $this->hasMany(Product::class, 'author_id');
     }
 
     // Factory

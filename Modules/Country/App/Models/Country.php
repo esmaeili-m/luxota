@@ -38,5 +38,11 @@ class Country extends Model
         return $this->belongsTo(\Modules\Zone\App\Models\Zone::class);
     }
 
+    public function currency()
+    {
+        return $this->belongsTo(\Modules\Currency\App\Models\Currency::class);
+
+    }
+
 
 }
