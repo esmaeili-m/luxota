@@ -3,6 +3,8 @@
 namespace Modules\Product\App\resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Modules\AccountingFinance\App\Models\InvoiceItem;
+use Modules\AccountingFinance\App\resources\InvoiceItemResource;
 use Modules\Currency\Services\CurrencyService;
 
 class ProductResource extends JsonResource
@@ -67,6 +69,9 @@ class ProductResource extends JsonResource
             'score' => $this->whenLoaded('comments', function () {
                 return $this->comments->avg('score') ?? 0;
             }),
+            'active_item' => $this->whenLoaded('active_item',function (){
+                return new InvoiceItemResource($this->active_item);
+            }),
             'video_script' => $this->video_script,
             'slug'        => $this->slug,
             'order'       => $this->order,
@@ -80,6 +85,7 @@ class ProductResource extends JsonResource
             'currency' => $currency->code ?? 'USD',
             'created_at'  => $this->created_at?->format('Y-m-d H:i:s'),
             'updated_at'  => $this->updated_at?->format('Y-m-d H:i:s'),
+
         ];
     }
 }

@@ -136,6 +136,6 @@ class ProductRepository
 
     public function getBySlug($slug)
     {
-        return Product::where('slug',$slug)->where('status',1)->with(['category','prices','author.products', 'comments.user', 'comments.comments.user'])->first();
+        return Product::where('slug',$slug)->where('status',1)->with(['category','prices','author.products', 'comments.user', 'comments.comments.user','active_item'])->first();
     }
 }

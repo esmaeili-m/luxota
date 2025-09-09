@@ -56,4 +56,10 @@ Route::prefix('v1')
         Route::delete('vouchers/{user}', [\Modules\AccountingFinance\App\Http\Controllers\VoucherController::class, 'destroy'])
             ->name('vouchers.destroy')
             ->middleware('permission:user.delete');
+
+        Route::post('invoices/invoice_add_item', [\Modules\AccountingFinance\App\Http\Controllers\InvoiceController::class, 'invoice_add_item'])
+            ->name('invoice.add.item');
+
+        Route::delete('invoices/invoice_remove_item/{id}', [\Modules\AccountingFinance\App\Http\Controllers\InvoiceController::class, 'invoice_remove_item'])
+            ->name('invoice.remove.item');
     });

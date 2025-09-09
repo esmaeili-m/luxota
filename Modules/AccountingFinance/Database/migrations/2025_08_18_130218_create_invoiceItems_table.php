@@ -13,15 +13,19 @@ return new class extends Migration
     {
         Schema::create('invoice_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('invoice_id')->constrained('invoices')->cascadeOnDelete();
+            $table->foreignId('invoice_id')->nullable()->constrained('invoices')->cascadeOnDelete();
             $table->foreignId('product_id')->nullable()->constrained('products')->nullOnDelete();
             $table->string('product_name');
             $table->decimal('unit_price', 15, 2);
             $table->integer('quantity');
+            $table->integer('user_id');
+            $table->integer('duration');
+            $table->boolean('status')->default(0);
             $table->text('remark')->nullable();
             $table->decimal('total', 15, 2);
             $table->decimal('unit_price_base', 15, 2);
             $table->decimal('total_base', 15, 2);
+            $table->softDeletes();
             $table->timestamps();
         });
     }

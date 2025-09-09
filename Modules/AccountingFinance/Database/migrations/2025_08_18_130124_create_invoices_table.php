@@ -18,7 +18,7 @@ return new class extends Migration
             $table->date('date');
             $table->date('due_date')->nullable();
             $table->bigInteger('status')->default(1);
-            $table->foreignId('currency_id')->constrained('currencies');
+            $table->bigInteger('currency_id');
             $table->decimal('exchange_rate', 15, 6)->nullable();
             $table->decimal('total', 15, 2)->default(0);
             $table->decimal('total_base', 15, 2)->default(0);

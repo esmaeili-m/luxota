@@ -6,6 +6,7 @@ use App\Traits\LogsRelations;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Modules\AccountingFinance\App\Models\InvoiceItem;
 use Modules\Category\App\Models\Category;
 use Modules\Price\App\Models\Price;
 use Modules\User\App\Models\User;
@@ -61,6 +62,10 @@ class Product extends Model
         return $this->belongsTo(Category::class);
     }
 
+    public function active_item()
+    {
+        return $this->hasOne(InvoiceItem::class)->where('status',0)->where('user_id',auth()->user()->id);
+    }
     public function author()
     {
         return $this->hasOne(User::class,'id','author_id');
