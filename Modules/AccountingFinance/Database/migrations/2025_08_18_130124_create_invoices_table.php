@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->bigInteger('invoice_code')->unique();
             $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->date('date');
             $table->date('due_date')->nullable();
             $table->bigInteger('status')->default(1);

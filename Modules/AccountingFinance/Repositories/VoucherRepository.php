@@ -3,6 +3,7 @@
 namespace Modules\AccountingFinance\Repositories;
 
 use Illuminate\Pagination\LengthAwarePaginator;
+use Modules\AccountingFinance\App\Models\UserVoucher;
 use Modules\AccountingFinance\App\Models\Voucher;
 
 class VoucherRepository
@@ -25,5 +26,20 @@ class VoucherRepository
     public function update(Voucher $voucher, array $data): bool
     {
         return $voucher->update($data);
+    }
+
+    public function get_vouchers_user()
+    {
+        return UserVoucher::where('user_id',auth()->user()->id)->whereHas('voucher')->with(['voucher.transactions'])->latest()->get();
+    }
+
+    public function redeem_voucher($data)
+    {
+        return UserVoucher::create($data);
+    }
+
+    public function find_voucher_with_code($code)
+    {
+        return Voucher::where('code',$code)->first();
     }
 }

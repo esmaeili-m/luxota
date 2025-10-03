@@ -30,4 +30,9 @@ class Voucher extends Model
     {
         return $this->hasOne(User::class,'id','created_by');
     }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
 }

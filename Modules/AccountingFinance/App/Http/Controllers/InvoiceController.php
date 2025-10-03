@@ -7,6 +7,9 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Modules\AccountingFinance\App\Http\Requests\CreateInvoiceItemRequest;
+use Modules\AccountingFinance\App\Http\Requests\CreateInvoiceRequest;
+use Modules\AccountingFinance\App\resources\InvoiceItemResource;
+use Modules\AccountingFinance\App\resources\InvoiceResource;
 use Modules\AccountingFinance\Services\InvoiceService;
 
 class InvoiceController extends Controller
@@ -20,6 +23,11 @@ class InvoiceController extends Controller
     /**
      * Display a listing of the resource.
      */
+    public function get_invoice_items()
+    {
+        $invoiceItem= $this->service->get_invoice_items();
+        return InvoiceItemResource::collection($invoiceItem);
+    }
     public function invoice_add_item(CreateInvoiceItemRequest $request)
     {
         return $this->service->add_item($request->validated());
@@ -28,25 +36,37 @@ class InvoiceController extends Controller
     {
         return $this->service->remove_item($id);
     }
+
+    public function get_invoice_item_count()
+    {
+        return $this->service->getCartCount();
+
+    }
     public function index()
     {
         return view('accountingfinance::index');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function store(CreateInvoiceRequest $request): InvoiceResource
     {
-        return view('accountingfinance::create');
+        $invoice=$this->service->createInvoice($request->validated());
+        return new InvoiceResource($invoice);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request): RedirectResponse
+    public function get_invoice($invoice_code)
     {
-        //
+        $invoice= $this->service->get_invoice($invoice_code);
+        if (!$invoice){
+            return response()->json(['error' => 'Not found'], 404);
+        }
+        return new InvoiceResource($invoice);
+
+    }
+
+    public function get_invoices_user()
+    {
+        $invoices=$this->service->get_invoices_user();
+        return InvoiceResource::collection($invoices);
     }
 
     /**
@@ -57,9 +77,6 @@ class InvoiceController extends Controller
         return view('accountingfinance::show');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit($id)
     {
         return view('accountingfinance::edit');

@@ -57,9 +57,40 @@ Route::prefix('v1')
             ->name('vouchers.destroy')
             ->middleware('permission:user.delete');
 
+        Route::get('invoices/get-vouchers-user', [\Modules\AccountingFinance\App\Http\Controllers\VoucherController::class, 'get_vouchers_user'])
+            ->name('get.vouchers.user');
+
+        Route::get('invoices/get-transactions-user/wallet', [\Modules\AccountingFinance\App\Http\Controllers\TransactionController::class, 'get_transactions_user_wallet'])
+            ->name('get.transactions.user.wallet');
+
+        Route::get('invoices/get-transactions-user/{id}', [\Modules\AccountingFinance\App\Http\Controllers\TransactionController::class, 'get_transactions_user'])
+            ->name('get.transactions.user.voucher');
+
+        Route::post('invoices/tranaction-item', [\Modules\AccountingFinance\App\Http\Controllers\TransactionController::class, 'create_tranaction_item'])
+            ->name('create.tranaction.item');
+
+        Route::post('invoices/redeem-voucher', [\Modules\AccountingFinance\App\Http\Controllers\VoucherController::class, 'redeem_voucher'])
+            ->name('vouchers.redeem.voucherr');
+
+
         Route::post('invoices/invoice_add_item', [\Modules\AccountingFinance\App\Http\Controllers\InvoiceController::class, 'invoice_add_item'])
             ->name('invoice.add.item');
 
+        Route::middleware('auth:sanctum')->get('invoices/invoiceItem', [\Modules\AccountingFinance\App\Http\Controllers\InvoiceController::class, 'get_invoice_items'])
+            ->name('invoice.items');
+
         Route::delete('invoices/invoice_remove_item/{id}', [\Modules\AccountingFinance\App\Http\Controllers\InvoiceController::class, 'invoice_remove_item'])
             ->name('invoice.remove.item');
+
+        Route::middleware('auth:sanctum')->get('/invoice/get_invoice_item_count/', [\Modules\AccountingFinance\App\Http\Controllers\InvoiceController::class, 'get_invoice_item_count'])
+            ->name('invoice.get.invoice.item.count');
+
+        Route::post('invoices', [\Modules\AccountingFinance\App\Http\Controllers\InvoiceController::class, 'store'])
+            ->name('invoice.create');
+
+        Route::get('invoices/find-by-invoice-code/{invoice_code}', [\Modules\AccountingFinance\App\Http\Controllers\InvoiceController::class, 'get_invoice'])
+            ->name('invoice.find.by.invoice.code');
+
+        Route::get('invoices/get-invoices-user', [\Modules\AccountingFinance\App\Http\Controllers\InvoiceController::class, 'get_invoices_user'])
+            ->name('invoice.list');
     });

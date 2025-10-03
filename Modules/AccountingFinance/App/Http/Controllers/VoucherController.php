@@ -8,6 +8,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Modules\AccountingFinance\App\Http\Requests\CreateVoucherRequest;
+use Modules\AccountingFinance\App\Http\Requests\RedeemVoucherRequest;
+use Modules\AccountingFinance\App\resources\UserVoucherResource;
 use Modules\AccountingFinance\App\resources\VoucherResource;
 use Modules\AccountingFinance\Services\VoucherService;
 
@@ -72,6 +74,19 @@ class VoucherController extends Controller
         $this->service->toggle_status($voucher, $id);
 
         return \response()->json('Voucher Updated Status Successfuly');
+    }
+
+    public function get_vouchers_user()
+    {
+        $vouchers=$this->service->get_vouchers_user();
+
+        return UserVoucherResource::collection($vouchers);
+    }
+
+    public function redeem_voucher(RedeemVoucherRequest $request)
+    {
+        $voucher=$this->service->redeem_voucher($request->validated());
+        return new VoucherResource($voucher);
     }
 
 }

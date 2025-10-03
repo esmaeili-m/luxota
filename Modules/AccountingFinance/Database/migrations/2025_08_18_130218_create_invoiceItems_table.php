@@ -17,8 +17,10 @@ return new class extends Migration
             $table->foreignId('product_id')->nullable()->constrained('products')->nullOnDelete();
             $table->string('product_name');
             $table->decimal('unit_price', 15, 2);
-            $table->integer('quantity');
-            $table->integer('user_id');
+            $table->integer('quantity')->default(1);
+            $table->decimal('discount_factor')->default(1);
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId('currency_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->integer('duration');
             $table->boolean('status')->default(0);
             $table->text('remark')->nullable();

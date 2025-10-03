@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Modules\AccountingFinance\App\Models\InvoiceItem;
 use Modules\Branch\App\Models\Branch;
 use Modules\City\App\Models\City;
 use Modules\Product\App\Models\Product;
@@ -125,6 +126,10 @@ class User extends Authenticatable
         return $this->hasMany(Product::class, 'author_id');
     }
 
+    public function invoiceItems()
+    {
+        return $this->hasMany(InvoiceItem::class);
+    }
     // Factory
 
     protected static function newFactory(): UserFactory

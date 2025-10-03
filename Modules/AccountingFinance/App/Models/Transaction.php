@@ -4,20 +4,19 @@ namespace Modules\AccountingFinance\App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Modules\AccountingFinance\Database\factories\TranactionItemFactory;
+use Modules\AccountingFinance\Database\factories\TransactionFactory;
 
-class TranactionItem extends Model
+class Transaction extends Model
 {
     use HasFactory;
-    protected $table='transaction_item';
 
     /**
      * The attributes that are mass assignable.
      */
     protected $guarded = [];
 
-    protected static function newFactory(): TranactionItemFactory
+    protected static function newFactory(): TransactionFactory
     {
-        //return TranactionItemFactory::new();
+        //return TransactionFactory::new();
     }
 }

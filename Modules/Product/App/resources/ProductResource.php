@@ -33,8 +33,8 @@ class ProductResource extends JsonResource
                     'per_month' => ($basePrice * 3 * 0.8) / 3,
                 ],
                 'six_months' => [
-                    'total'     => $basePrice * 6 * 0.6,
-                    'per_month' => ($basePrice * 6 * 0.6) / 6,
+                    'total'     => $basePrice * 6 * 0.55,
+                    'per_month' => ($basePrice * 6 * 0.55) / 6,
                 ],
             ];
 
