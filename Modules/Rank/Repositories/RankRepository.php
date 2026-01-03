@@ -5,19 +5,23 @@ use Modules\Rank\App\Models\Rank;
 
 class RankRepository
 {
-    public function all(): \Illuminate\Database\Eloquent\Collection
-    {
-        return Rank::where('status',1)->get();
-    }
 
     public function getTrashedRanks(): \Illuminate\Database\Eloquent\Collection
     {
         return Rank::onlyTrashed()->get();
     }
 
-    public function paginate(int $perPage = 15): LengthAwarePaginator
+    public function getRanks(array $filters = [] , $perPage = 15, $paginate = true)
     {
-        return Rank::paginate($perPage);
+        $query = Rank::query();
+        if (!empty($filters)) {
+            $query->search($filters);
+        }
+        if ($paginate) {
+            return $query->paginate($perPage);
+        } else {
+            return $query->get();
+        }
     }
 
     public function find(int $id, array $with = [])
@@ -56,24 +60,4 @@ class RankRepository
         $rank->forceDelete();
     }
 
-    public function searchByFields(array $filters)
-    {
-        $query = Rank::query();
-
-        foreach ($filters as $field => $value) {
-            if (empty($value)) continue;
-
-            switch ($field) {
-                case 'title':
-                    $query->where('title', 'like', "%{$value}%");
-                    break;
-
-                case 'status':
-                    $query->where('status', $value);
-                    break;
-            }
-        }
-
-        return $query->get();
-    }
 }

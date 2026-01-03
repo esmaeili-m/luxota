@@ -17,32 +17,26 @@ class ZoneTableSeeder extends Seeder
         Zone::truncate();
         $zones = [
             [
-                'title' => 'North Zone',
-                'description' => 'Northern region of the city',
+                'title' => 'Gulf Area',
+                'description' => 'Gulf Area',
                 'status' => true
             ],
             [
-                'title' => 'South Zone',
-                'description' => 'Southern region of the city',
+                'title' => 'Iran',
+                'description' => 'Iran',
                 'status' => true
             ],
             [
-                'title' => 'East Zone',
-                'description' => 'Eastern region of the city',
+                'title' => 'Levant area',
+                'description' => 'Levant area',
                 'status' => true
             ],
             [
-                'title' => 'West Zone',
-                'description' => 'Western region of the city',
-                'status' => true
-            ],
-            [
-                'title' => 'Central Zone',
-                'description' => 'Central business district',
+                'title' => 'Bahrain & KSA',
+                'description' => 'Bahrain & KSA',
                 'status' => true
             ],
         ];
         Zone::insert($zones);
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
-} 
+}

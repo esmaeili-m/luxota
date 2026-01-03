@@ -15,9 +15,21 @@ class CategoryRepository
         return Category::onlyTrashed()->orderBy('order')->get();
     }
 
-    public function paginate(int $perPage = 15): LengthAwarePaginator
+    public function getCategories(array $filters = [], $perPage = 15, $paginate = true, $sort = ['by' => 'id', 'direction' => 'asc'])
     {
-        return Category::whereNull('parent_id')->orderBy('order')->paginate($perPage);
+        $query = Category::query();
+
+        if (!empty($filters)) {
+            $query->search($filters);
+        }
+
+        if (!empty($sort['by']) && !empty($sort['direction'])) {
+            $query->orderBy($sort['by'], $sort['direction']);
+        }
+
+        return $paginate
+            ? $query->paginate($perPage)
+            : $query->get();
     }
 
     public function find(int $id, array $with = [])
@@ -57,39 +69,6 @@ class CategoryRepository
         $category->forceDelete();
     }
 
-    public function searchByFields(array $filters)
-    {
-        $query = Category::query();
-
-        foreach ($filters as $field => $value) {
-            if (empty($value)) continue;
-
-            switch ($field) {
-                case 'title':
-                    $query->where('title', 'like', "%{$value}%");
-                    break;
-
-                case 'subtitle':
-                    $query->where('subtitle', 'like', "%{$value}%");
-                    break;
-
-                case 'slug':
-                    $query->where('slug', 'like', "%{$value}%");
-                    break;
-
-                case 'status':
-                    $query->where('status', $value);
-                    break;
-
-                case 'category_code':
-                    $query->where('category_code', $value);
-                    break;
-
-            }
-        }
-
-        return $query->get();
-    }
 
     public function getChildrenCategory(int $id,int $perPage= 15):LengthAwarePaginator
     {

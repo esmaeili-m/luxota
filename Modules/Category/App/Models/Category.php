@@ -44,4 +44,40 @@ class Category extends Model
     {
         return $this->hasMany(Product::class);
     }
+
+    public function scopeSearch($query, $filters)
+    {
+        foreach ($filters ?? [] as $field => $value) {
+            if ($value === null || $value === '') {
+                continue;
+            }
+
+            switch ($field) {
+
+                case 'title':
+                    $query->where('title', $value);
+                    break;
+
+                case 'parent_id':
+                    if ($value === 'null' || $value === null) {
+                        $query->whereNull('parent_id');
+                    } else {
+                        $query->where('parent_id', $value);
+                    }
+                    break;
+
+                case 'subtitle':
+                    $query->where('subtitle', 'like', "%{$value}%");
+                    break;
+
+                case 'status':
+                    $query->where('status', $value);
+                    break;
+            }
+        }
+
+        return $query;
+
+    }
+
 }

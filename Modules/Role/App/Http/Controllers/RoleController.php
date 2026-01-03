@@ -5,6 +5,7 @@ namespace Modules\Role\App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Modules\Role\App\Http\Requests\CreateRoleRequest;
+use Modules\Role\App\Http\Requests\UpdateRoleRequest;
 use Modules\Role\App\resources\RoleCollection;
 use Modules\Role\App\resources\RoleResource;
 use Modules\Role\Services\RoleService;
@@ -22,35 +23,6 @@ class RoleController extends Controller
     public function __construct(RoleService $service)
     {
         $this->service = $service;
-    }
-
-    /**
-     * Get all roles
-     *
-     * @OA\Get(
-     *     path="/api/v1/roles",
-     *     tags={"Roles"},
-     *     summary="Get list of roles",
-     *     description="Returns a list of roles",
-     *     operationId="getRoles",
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful operation",
-     *         @OA\JsonContent(
-     *             type="array",
-     *             @OA\Items(ref="#/components/schemas/Role")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Unauthenticated"
-     *     )
-     * )
-     */
-    public function all(): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
-    {
-        $roles = $this->service->getAll();
-        return RoleResource::collection($roles);
     }
 
     /**
@@ -90,9 +62,9 @@ class RoleController extends Controller
      *     )
      * )
      */
-    public function index(): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index(Request $request)
     {
-        $roles = $this->service->getPaginated();
+        $roles = $this->service->getRoles($request->only(['status','name','per_page','paginate']));
         return RoleResource::collection($roles);
     }
 
@@ -235,7 +207,7 @@ class RoleController extends Controller
      *     )
      * )
      */
-    public function update($id, CreateRoleRequest $request): RoleResource|\Illuminate\Http\JsonResponse
+    public function update($id, UpdateRoleRequest $request): RoleResource|\Illuminate\Http\JsonResponse
     {
         $role = $this->service->update($id, $request->validated());
 
@@ -289,47 +261,6 @@ class RoleController extends Controller
         }
 
         return response()->json(['message' => 'Role deleted successfully']);
-    }
-
-    /**
-     * Search roles by fields
-     *
-     * @OA\Get(
-     *     path="/api/v1/roles/search",
-     *     tags={"Roles"},
-     *     summary="Search roles",
-     *     description="Search roles by various fields",
-     *     operationId="searchRoles",
-     *     @OA\Parameter(
-     *         name="name",
-     *         in="query",
-     *         required=false,
-     *         @OA\Schema(type="string"),
-     *         description="Search by name"
-     *     ),
-     *     @OA\Parameter(
-     *         name="status",
-     *         in="query",
-     *         required=false,
-     *         @OA\Schema(type="boolean"),
-     *         description="Filter by status"
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful operation",
-     *         @OA\JsonContent(ref="#/components/schemas/RoleCollection")
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Unauthenticated"
-     *     )
-     * )
-     */
-    public function search(Request $request): RoleCollection
-    {
-        $filters = $request->only(['name', 'status']);
-        $roles = $this->service->searchByFields($filters);
-        return new RoleCollection($roles);
     }
 
     /**
@@ -441,43 +372,4 @@ class RoleController extends Controller
         return RoleResource::collection($roles);
     }
 
-    /**
-     * Toggle role status
-     *
-     * @OA\Patch(
-     *     path="/api/v1/roles/{id}/toggle-status",
-     *     tags={"Roles"},
-     *     summary="Toggle role status",
-     *     description="Toggles the status of a role between active and inactive",
-     *     operationId="toggleRoleStatus",
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         required=true,
-     *         @OA\Schema(type="integer", example=1),
-     *         description="The ID of the role to toggle status"
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Status toggled successfully",
-     *         @OA\JsonContent(ref="#/components/schemas/Role")
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Role not found"
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Unauthenticated"
-     *     )
-     * )
-     */
-    public function toggle_status($id): RoleResource|\Illuminate\Http\JsonResponse
-    {
-        $role = $this->service->toggle_status($id);
-        if (!$role) {
-            return response()->json(['error' => 'Not found'], 404);
-        }
-        return response()->json(['message' => 'Change Status successfully']);
-    }
 }

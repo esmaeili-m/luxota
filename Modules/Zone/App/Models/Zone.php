@@ -38,4 +38,51 @@ class Zone extends Model
     {
         return $this->hasMany(\App\Models\User::class);
     }
+    protected static function booted()
+    {
+        static::updated(function ($zone) {
+            if ($zone->isDirty('status')) {
+                foreach ($zone->users as $user) {
+                    $user->status = $zone->status;
+                    $user->save();
+                }
+            }
+        });
+
+        static::deleted(function ($zone) {
+            foreach ($zone->users()->get() as $user) {
+                $user->delete();
+            }
+        });
+
+        static::restored(function ($zone) {
+            foreach ($zone->users()->withTrashed()->get() as $user) {
+                $user->restore();
+            }
+        });
+    }
+    public function scopeSearch($query, $fillters)
+    {
+
+        foreach ($fillters ?? [] as $filed){
+            if (!$filed) {
+                break;
+            }
+            switch ($filed) {
+                case 'title':
+                    $query->where('title', $filed);
+                    break;
+
+                case 'description':
+                    $query->where('description', 'like', "%{$filed}%");
+                    break;
+
+                case 'status':
+                    $query->where('status', $filed);
+                    break;
+            }
+        }
+
+        return $query;
+    }
 }

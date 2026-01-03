@@ -108,7 +108,6 @@ class ProductTableSeeder extends Seeder
         // Insert into DB
         DB::table('products')->insert($products);
 
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
 }
 

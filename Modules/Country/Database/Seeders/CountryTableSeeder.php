@@ -39,6 +39,5 @@ class CountryTableSeeder extends Seeder
         }
         fclose($file);
         DB::table('countries')->insert($countries);
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
 }

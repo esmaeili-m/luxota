@@ -12,8 +12,8 @@ class CreateReferrerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required|string|max:255|unique:referrers,title,' . $this->route('referrer'),
-            'status' => 'boolean',
+            'title' => 'required|string|max:255|unique:referrers,title' ,
+            'status' => 'in:0,1',
         ];
     }
 
@@ -35,4 +35,4 @@ class CreateReferrerRequest extends FormRequest
     {
         return true;
     }
-} 
+}

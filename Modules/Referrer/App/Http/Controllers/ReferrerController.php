@@ -5,6 +5,7 @@ namespace Modules\Referrer\App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Modules\Referrer\App\Http\Requests\CreateReferrerRequest;
+use Modules\Referrer\App\Http\Requests\UpdateReferrerRequest;
 use Modules\Referrer\App\resources\ReferrerCollection;
 use Modules\Referrer\App\resources\ReferrerResource;
 use Modules\Referrer\Services\ReferrerService;
@@ -22,35 +23,6 @@ class ReferrerController extends Controller
     public function __construct(ReferrerService $service)
     {
         $this->service = $service;
-    }
-
-    /**
-     * Get all referrers
-     *
-     * @OA\Get(
-     *     path="/api/v1/referrers/all",
-     *     tags={"Referrers"},
-     *     summary="Get all referrers",
-     *     description="Returns a list of all referrers",
-     *     operationId="getAllReferrers",
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful operation",
-     *         @OA\JsonContent(
-     *             type="array",
-     *             @OA\Items(ref="#/components/schemas/Referrer")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Unauthenticated"
-     *     )
-     * )
-     */
-    public function all(): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
-    {
-        $referrers = $this->service->getAll();
-        return ReferrerResource::collection($referrers);
     }
 
     /**
@@ -90,9 +62,9 @@ class ReferrerController extends Controller
      *     )
      * )
      */
-    public function index(): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
-        $referrers = $this->service->getPaginated();
+        $referrers = $this->service->getReferrers($request->only(['status','title','per_page','paginate']));
         return ReferrerResource::collection($referrers);
     }
 
@@ -237,7 +209,7 @@ class ReferrerController extends Controller
      *     )
      * )
      */
-    public function update($id, CreateReferrerRequest $request): ReferrerResource|\Illuminate\Http\JsonResponse
+    public function update($id, UpdateReferrerRequest $request): ReferrerResource|\Illuminate\Http\JsonResponse
     {
         $referrer = $this->service->update($id, $request->validated());
 
@@ -297,54 +269,6 @@ class ReferrerController extends Controller
         return response()->json(['message' => 'Referrer deleted successfully']);
     }
 
-    /**
-     * Search referrers
-     *
-     * @OA\Get(
-     *     path="/api/v1/referrers/search",
-     *     tags={"Referrers"},
-     *     summary="Search referrers",
-     *     description="Search referrers by various fields",
-     *     operationId="searchReferrers",
-     *     @OA\Parameter(
-     *         name="title",
-     *         in="query",
-     *         required=false,
-     *         @OA\Schema(type="string"),
-     *         description="Search by title"
-     *     ),
-     *     @OA\Parameter(
-     *         name="status",
-     *         in="query",
-     *         required=false,
-     *         @OA\Schema(type="boolean"),
-     *         description="Filter by status"
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful operation",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(
-     *                 property="data",
-     *                 type="array",
-     *                 @OA\Items(ref="#/components/schemas/Referrer")
-     *             ),
-     *             @OA\Property(property="total", type="integer")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Unauthenticated"
-     *     )
-     * )
-     */
-    public function search(Request $request): ReferrerCollection
-    {
-        $filters = $request->only(['title', 'status']);
-        $referrers = $this->service->searchByFields($filters);
-        return new ReferrerCollection($referrers);
-    }
 
     /**
      * Restore a deleted referrer
@@ -472,53 +396,4 @@ class ReferrerController extends Controller
         return ReferrerResource::collection($referrers);
     }
 
-    /**
-     * Toggle referrer status
-     *
-     * @OA\Post(
-     *     path="/api/v1/referrers/{id}/toggle-status",
-     *     tags={"Referrers"},
-     *     summary="Toggle referrer status",
-     *     description="Toggles the status of a referrer between active and inactive",
-     *     operationId="toggleReferrerStatus",
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         required=true,
-     *         @OA\Schema(type="integer", example=1),
-     *         description="The ID of the referrer to toggle status"
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Status changed successfully",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="message", type="string", example="Change Status successfully")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Referrer not found",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="error", type="string", example="Not found")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Unauthenticated"
-     *     )
-     * )
-     */
-    public function toggle_status($id): ReferrerResource|\Illuminate\Http\JsonResponse
-    {
-        $referrer = $this->service->getById($id);
-
-        if (!$referrer) {
-            return response()->json(['error' => 'Not found'], 404);
-        }
-
-        $this->service->toggle_status($id);
-        return new ReferrerResource($referrer->fresh());
-    }
 }

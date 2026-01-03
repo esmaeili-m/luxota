@@ -23,9 +23,6 @@ Route::prefix('v1')
     ->name('api.v1.')
     ->group(function () {
 
-        Route::get('ranks/all', [RankController::class, 'all'])
-            ->middleware('permission:rank.index');
-
         Route::delete('ranks/force-delete/{id}', [RankController::class, 'forceDelete'])
             ->middleware('permission:rank.delete');
 
@@ -34,12 +31,6 @@ Route::prefix('v1')
 
         Route::get('ranks/trash', [RankController::class, 'trash'])
             ->middleware('permission:rank.trash');
-
-        Route::post('ranks/{id}/toggle-status', [RankController::class, 'toggle_status'])
-            ->middleware('permission:rank.update');
-
-        Route::get('ranks/search', [RankController::class, 'search'])
-            ->middleware('permission:rank.index');
 
         Route::get('ranks', [RankController::class, 'index'])
             ->name('ranks.index')
@@ -54,10 +45,6 @@ Route::prefix('v1')
             ->middleware('permission:rank.index');
 
         Route::put('ranks/{rank}', [RankController::class, 'update'])
-            ->name('ranks.update')
-            ->middleware('permission:rank.update');
-
-        Route::patch('ranks/{rank}', [RankController::class, 'update'])
             ->name('ranks.update')
             ->middleware('permission:rank.update');
 

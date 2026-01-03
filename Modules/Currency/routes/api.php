@@ -17,3 +17,9 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth:sanctum'])->prefix('v1')->name('api.')->group(function () {
     Route::get('currency', fn (Request $request) => $request->user())->name('currency');
 });
+Route::prefix('v1')
+    ->name('api.v1.')
+    ->group(function () {
+        Route::get('currencies/all', [\Modules\Currency\App\Http\Controllers\CurrencyController::class, 'all']);
+
+    });

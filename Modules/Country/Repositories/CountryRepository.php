@@ -17,11 +17,20 @@ class CountryRepository
         return Country::where('status', true)->whereNot('phone_code','')->orderBy('en')->get();
     }
 
-    public function paginate(int $perPage = 15): LengthAwarePaginator
-    {
-        return Country::paginate($perPage);
-    }
 
+    public function getCountries(array $filters = [] , $perPage = 15, $paginate = true)
+    {
+        $query = Country::query()->with('currency');
+        if (!empty($filters)) {
+            $query->search($filters);
+        }
+        if ($paginate) {
+            return $query->paginate($perPage);
+        } else {
+
+            return $query->get();
+        }
+    }
     public function find($id): ?Country
     {
         return Country::find($id);

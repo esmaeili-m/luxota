@@ -10,15 +10,19 @@ use Modules\AccountingFinance\App\Http\Requests\CreateInvoiceItemRequest;
 use Modules\AccountingFinance\App\Http\Requests\CreateInvoiceRequest;
 use Modules\AccountingFinance\App\resources\InvoiceItemResource;
 use Modules\AccountingFinance\App\resources\InvoiceResource;
+use Modules\AccountingFinance\App\resources\InvoiceTransactionsResource;
 use Modules\AccountingFinance\Services\InvoiceService;
+use Modules\AccountingFinance\Services\VoucherService;
 
 class InvoiceController extends Controller
 {
     public InvoiceService $service;
+    public VoucherService $voucher_service;
 
-    public function __construct(InvoiceService $service)
+    public function __construct(InvoiceService $service,VoucherService $voucher_service)
     {
         $this->service = $service;
+        $this->voucher_service = $voucher_service;
     }
     /**
      * Display a listing of the resource.
@@ -37,14 +41,27 @@ class InvoiceController extends Controller
         return $this->service->remove_item($id);
     }
 
+    public function invoice_transactions($invoice_code)
+    {
+        return $this->service->get_invoice_transactions($invoice_code);
+
+    }
     public function get_invoice_item_count()
     {
         return $this->service->getCartCount();
 
     }
-    public function index()
+    public function index(Request $request)
     {
-        return view('accountingfinance::index');
+        $input = $request->only([
+            'status',
+            'invoice_code',
+            'per_page',
+            'paginate',
+        ]);
+        $input['paginate'] = $request->boolean('paginate');
+        $categories = $this->service->getInvoices($input);
+        return InvoiceResource::collection($categories);
     }
 
     public function store(CreateInvoiceRequest $request): InvoiceResource
@@ -62,7 +79,25 @@ class InvoiceController extends Controller
         return new InvoiceResource($invoice);
 
     }
+    public function get_invoice_with_transaction($invoice_code)
+    {
+        $invoice= $this->service->get_invoice_with_transaction($invoice_code);
+        if (!$invoice){
+            return response()->json(['error' => 'Not found'], 404);
+        }
+        return new InvoiceResource($invoice);
 
+    }
+
+    public function clear_invoice($invoiceId)
+    {
+        $this->service->clear_invoice($invoiceId);
+        return response()->json([
+            'success' => true,
+            'message' => 'Invoice cleared successfully',
+        ], 200);
+
+    }
     public function get_invoices_user()
     {
         $invoices=$this->service->get_invoices_user();

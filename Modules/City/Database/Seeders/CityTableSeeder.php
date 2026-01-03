@@ -37,6 +37,5 @@ class CityTableSeeder extends Seeder
         }
         fclose($file);
         DB::table('cities')->insert($cities);
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
 }

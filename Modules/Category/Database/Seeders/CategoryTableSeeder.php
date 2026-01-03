@@ -73,6 +73,5 @@ class CategoryTableSeeder extends Seeder
 
         fclose($file);
         DB::table('categories')->insert($categories);
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
 }

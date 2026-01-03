@@ -133,11 +133,11 @@ class UserService
     public function getFormData()
     {
         return [
-            'countries' => $this->countryService->getActive()->pluck('phone_code','id'),
-            'zones'     => $this->zoneService->getAll()->where('status',1)->pluck('title', 'id'),
-            'ranks'     => $this->rankService->getAll()->where('status',1)->pluck('title','id'),
-            'referrers' => $this->referrerService->getAll()->where('status',1)->pluck('title','id'),
-            'branches'  => $this->branchService->getAll()->where('status',1)->pluck('title','id'),
+            'countries' => $this->countryService->getCountries(['status' => 1,'paginate' => false])->where('phone_code','!=','')->pluck('phone_code','id'),
+            'zones'     => $this->zoneService->getZones(['status' => 1,'paginate' => false])->pluck('title', 'id'),
+            'ranks'     => $this->rankService->getRanks(['status' => 1,'paginate' => false])->pluck('title','id'),
+            'referrers' => $this->referrerService->getReferrers(['status' => 1,'paginate' => false])->pluck('title','id'),
+            'branches'  => $this->branchService->getBranches(['status' => 1,'paginate' => false])->pluck('title','id'),
             'parents'   => $this->repo->getParentUsers(),
         ];
     }

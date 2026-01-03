@@ -5,6 +5,7 @@ namespace Modules\Zone\App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Modules\Zone\App\Http\Requests\CreateZoneRequest;
+use Modules\Zone\App\Http\Requests\UpdateZoneRequest;
 use Modules\Zone\App\resources\ZoneCollection;
 use Modules\Zone\App\resources\ZoneResource;
 use Modules\Zone\Services\ZoneService;
@@ -22,35 +23,6 @@ class ZoneController extends Controller
     public function __construct(ZoneService $service)
     {
         $this->service = $service;
-    }
-
-    /**
-     * Get all zones
-     *
-     * @OA\Get(
-     *     path="/api/v1/zones/all",
-     *     tags={"Zones"},
-     *     summary="Get all zones",
-     *     description="Returns a list of all zones",
-     *     operationId="getAllZones",
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful operation",
-     *         @OA\JsonContent(
-     *             type="array",
-     *             @OA\Items(ref="#/components/schemas/Zone")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Unauthenticated"
-     *     )
-     * )
-     */
-    public function all(): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
-    {
-        $zones = $this->service->getAll();
-        return ZoneResource::collection($zones);
     }
 
     /**
@@ -90,9 +62,11 @@ class ZoneController extends Controller
      *     )
      * )
      */
-    public function index(): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
-        $zones = $this->service->getPaginated();
+        $input = $request->only(['status','title','description','per_page','paginate']);
+        $input['paginate'] = $request->boolean('paginate');
+        $zones = $this->service->getZones($input);
         return ZoneResource::collection($zones);
     }
 
@@ -234,7 +208,7 @@ class ZoneController extends Controller
      *     )
      * )
      */
-    public function update($id, CreateZoneRequest $request): ZoneResource|\Illuminate\Http\JsonResponse
+    public function update($id, UpdateZoneRequest $request): ZoneResource|\Illuminate\Http\JsonResponse
     {
         $zone = $this->service->update($id, $request->validated());
 
@@ -288,63 +262,6 @@ class ZoneController extends Controller
         }
 
         return response()->json(['message' => 'Zone deleted successfully']);
-    }
-
-    /**
-     * Search zones
-     *
-     * @OA\Get(
-     *     path="/api/v1/zones/search",
-     *     tags={"Zones"},
-     *     summary="Search zones",
-     *     description="Search zones by various criteria",
-     *     operationId="searchZones",
-     *     @OA\Parameter(
-     *         name="title",
-     *         in="query",
-     *         required=false,
-     *         @OA\Schema(type="string"),
-     *         description="Search by zone title"
-     *     ),
-     *     @OA\Parameter(
-     *         name="description",
-     *         in="query",
-     *         required=false,
-     *         @OA\Schema(type="string"),
-     *         description="Search by zone description"
-     *     ),
-     *     @OA\Parameter(
-     *         name="status",
-     *         in="query",
-     *         required=false,
-     *         @OA\Schema(type="boolean"),
-     *         description="Filter by status"
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful operation",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(
-     *                 property="data",
-     *                 type="array",
-     *                 @OA\Items(ref="#/components/schemas/Zone")
-     *             ),
-     *             @OA\Property(property="total", type="integer")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Unauthenticated"
-     *     )
-     * )
-     */
-    public function search(Request $request): ZoneCollection
-    {
-        $filters = $request->only(['title', 'description', 'status']);
-        $zones = $this->service->searchByFields($filters);
-        
-        return new ZoneCollection($zones);
     }
 
     /**
@@ -465,56 +382,4 @@ class ZoneController extends Controller
         return ZoneResource::collection($zones);
     }
 
-    /**
-     * Toggle zone status
-     *
-     * @OA\Patch(
-     *     path="/api/v1/zones/{id}/toggle-status",
-     *     tags={"Zones"},
-     *     summary="Toggle zone status",
-     *     description="Toggles the status of a zone between active and inactive",
-     *     operationId="toggleZoneStatus",
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         required=true,
-     *         @OA\Schema(type="integer", example=1),
-     *         description="The ID of the zone to toggle status"
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Status toggled successfully",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(
-     *                 property="data",
-     *                 type="object",
-     *                 @OA\Property(property="status", type="boolean"),
-     *                 @OA\Property(property="status_label", type="string")
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Zone not found"
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Unauthenticated"
-     *     )
-     * )
-     */
-    public function toggle_status($id): ZoneResource|\Illuminate\Http\JsonResponse
-    {
-        $zone = $this->service->getById($id);
-
-        if (!$zone) {
-            return response()->json(['error' => 'Not found'], 404);
-        }
-
-        $this->service->toggle_status($id);
-        
-        $updatedZone = $this->service->getById($id);
-        return new ZoneResource($updatedZone);
-    }
 }

@@ -9,6 +9,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Modules\AccountingFinance\App\Models\InvoiceItem;
+use Modules\AccountingFinance\App\Models\UserVoucher;
+use Modules\AccountingFinance\App\Models\Voucher;
 use Modules\Branch\App\Models\Branch;
 use Modules\City\App\Models\City;
 use Modules\Product\App\Models\Product;
@@ -124,6 +126,10 @@ class User extends Authenticatable
     public function products()
     {
         return $this->hasMany(Product::class, 'author_id');
+    }
+    public function vouchers()
+    {
+        return $this->hasMany(Voucher::class,UserVoucher::class);
     }
 
     public function invoiceItems()

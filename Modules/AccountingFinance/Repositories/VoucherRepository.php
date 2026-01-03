@@ -30,7 +30,9 @@ class VoucherRepository
 
     public function get_vouchers_user()
     {
-        return UserVoucher::where('user_id',auth()->user()->id)->whereHas('voucher')->with(['voucher.transactions'])->latest()->get();
+        return UserVoucher::where('user_id',auth()->user()->id)->whereHas('voucher')->with(['voucher.transactions','transactions_temp'=>function ($query){
+            $query->where('status',0);
+        }])->latest()->get();
     }
 
     public function redeem_voucher($data)

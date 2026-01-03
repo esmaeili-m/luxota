@@ -17,11 +17,7 @@ class Branch extends Model
     /**
      * The attributes that are mass assignable.
      */
-    protected $fillable = [
-        'title',
-        'status'
-    ];
-    protected static $recordEvents = ['created', 'updated', 'deleted', 'restored', 'forceDeleted'];
+    protected $guarded = [];
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
@@ -45,5 +41,50 @@ class Branch extends Model
     public function users()
     {
         return $this->hasMany(\App\Models\User::class);
+    }
+    protected static function booted()
+    {
+        static::updated(function ($branch) {
+            if ($branch->isDirty('status')) {
+                foreach ($branch->users as $user) {
+                    $user->status = $branch->status;
+                    $user->save();
+                }
+            }
+        });
+
+        static::deleted(function ($branch) {
+            foreach ($branch->users()->get() as $user) {
+                $user->delete();
+            }
+        });
+
+        static::restored(function ($branch) {
+            foreach ($branch->users()->withTrashed()->get() as $user) {
+                $user->restore();
+            }
+        });
+    }
+    public function scopeSearch($query, $fillters)
+    {
+
+        foreach ($fillters ?? [] as $filed){
+            if (!$filed) {
+                break;
+            }
+            switch ($filed) {
+                case 'title':
+                    $query->where('title', $filed);
+                    break;
+
+                case 'status':
+                    $query->where('status', $filed);
+                    break;
+
+
+            }
+        }
+
+        return $query;
     }
 }

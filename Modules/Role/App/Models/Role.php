@@ -11,13 +11,9 @@ class Role extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $guarded = [
+    protected $guarded = [];
 
-    ];
-
-
-    protected $casts = [
-    ];
+    protected $casts = [];
 
 
     public function users()

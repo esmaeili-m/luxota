@@ -10,6 +10,18 @@ use Modules\User\App\Models\User;
 
 class InvoiceRepository
 {
+
+    public function getInvoices(array $filters = [], $perPage = 15, $paginate = true)
+    {
+        $query = Invoice::query()->with(['invoice_items.product','user','currency']);
+
+        if (!empty($filters)) {
+            $query->search($filters);
+        }
+        return $paginate
+            ? $query->paginate($perPage)
+            : $query->get();
+    }
     public function get_items()
     {
         return InvoiceItem::where('user_id',auth()->user()->id)->where('status',0)->with(['currency'])->get();
@@ -59,9 +71,22 @@ class InvoiceRepository
 
     public function get_invoice($invoice_code)
     {
-        return Invoice::where('invoice_code',$invoice_code)->where('user_id',auth()->user()->id)->with(['user','currency','invoice_items'])->first();
+        return Invoice::where('invoice_code',$invoice_code)->where('user_id',auth()->user()->id)->with(['user','currency','invoice_items','transactions_item'])->first();
+    }
+    public function get_invoice_by_id($invoiceId)
+    {
+        return Invoice::where('user_id',auth()->user()->id)->with(['user','currency','invoice_items','transactions_item'])->find($invoiceId);
+    }
+    public function get_invoice_with_transaction($invoice_code)
+    {
+        return Invoice::where('invoice_code',$invoice_code)->where('user_id',auth()->user()->id)->with(['user.vouchers.transactions','currency','invoice_items','transactions_item'])->first();
     }
 
+    public function get_invoice_transactions($invoice_code)
+    {
+        return Invoice::where('invoice_code',$invoice_code)->where('user_id',auth()->user()->id)->with(['user','currency','invoice_items','transactions_item'])->first();
+
+    }
     public function get_invoices_user()
     {
         return Invoice::where('user_id',auth()->user()->id)->with(['invoice_items.product','currency'])->latest()->get();

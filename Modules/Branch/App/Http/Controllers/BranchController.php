@@ -5,6 +5,7 @@ namespace Modules\Branch\App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Modules\Branch\App\Http\Requests\CreateBranchRequest;
+use Modules\Branch\App\Http\Requests\UpdateBranchRequest;
 use Modules\Branch\App\resources\BranchCollection;
 use Modules\Branch\App\resources\BranchResource;
 use Modules\Branch\Services\BranchService;
@@ -22,35 +23,6 @@ class BranchController extends Controller
     public function __construct(BranchService $service)
     {
         $this->service = $service;
-    }
-
-    /**
-     * Get all branches
-     *
-     * @OA\Get(
-     *     path="/api/v1/branches/all",
-     *     tags={"Branches"},
-     *     summary="Get all branches",
-     *     description="Returns a list of all branches",
-     *     operationId="getAllBranches",
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful operation",
-     *         @OA\JsonContent(
-     *             type="array",
-     *             @OA\Items(ref="#/components/schemas/Branch")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Unauthenticated"
-     *     )
-     * )
-     */
-    public function all(): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
-    {
-        $branches = $this->service->getAll();
-        return BranchResource::collection($branches);
     }
 
     /**
@@ -90,9 +62,9 @@ class BranchController extends Controller
      *     )
      * )
      */
-    public function index(): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
-        $branches = $this->service->getPaginated();
+        $branches = $this->service->getBranches($request->only(['status','title','per_page','paginate']));
         return BranchResource::collection($branches);
     }
 
@@ -237,7 +209,7 @@ class BranchController extends Controller
      *     )
      * )
      */
-    public function update($id, CreateBranchRequest $request): BranchResource|\Illuminate\Http\JsonResponse
+    public function update($id, UpdateBranchRequest $request): BranchResource|\Illuminate\Http\JsonResponse
     {
         $branch = $this->service->update($id, $request->validated());
 
@@ -295,55 +267,6 @@ class BranchController extends Controller
         }
 
         return response()->json(['message' => 'Branch deleted successfully']);
-    }
-
-    /**
-     * Search branches
-     *
-     * @OA\Get(
-     *     path="/api/v1/branches/search",
-     *     tags={"Branches"},
-     *     summary="Search branches",
-     *     description="Search branches by various criteria",
-     *     operationId="searchBranches",
-     *     @OA\Parameter(
-     *         name="title",
-     *         in="query",
-     *         required=false,
-     *         @OA\Schema(type="string"),
-     *         description="Search by title"
-     *     ),
-     *     @OA\Parameter(
-     *         name="status",
-     *         in="query",
-     *         required=false,
-     *         @OA\Schema(type="boolean"),
-     *         description="Filter by status"
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful operation",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(
-     *                 property="data",
-     *                 type="array",
-     *                 @OA\Items(ref="#/components/schemas/Branch")
-     *             ),
-     *             @OA\Property(property="total", type="integer")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Unauthenticated"
-     *     )
-     * )
-     */
-    public function search(Request $request): BranchCollection
-    {
-        $filters = $request->only(['title', 'status']);
-        $branches = $this->service->searchByFields($filters);
-        return new BranchCollection($branches);
     }
 
     /**
@@ -472,52 +395,4 @@ class BranchController extends Controller
         return BranchResource::collection($branches);
     }
 
-    /**
-     * Toggle branch status
-     *
-     * @OA\Post(
-     *     path="/api/v1/branches/{id}/toggle-status",
-     *     tags={"Branches"},
-     *     summary="Toggle branch status",
-     *     description="Toggles the status of a branch between active and inactive",
-     *     operationId="toggleBranchStatus",
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         required=true,
-     *         @OA\Schema(type="integer", example=1),
-     *         description="The ID of the branch to toggle status"
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Status changed successfully",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="message", type="string", example="Change Status successfully")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Branch not found",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="error", type="string", example="Not found")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Unauthenticated"
-     *     )
-     * )
-     */
-    public function toggle_status($id): BranchResource|\Illuminate\Http\JsonResponse
-    {
-        try {
-            $this->service->toggle_status($id);
-            $branch = $this->service->getById($id);
-            return new BranchResource($branch);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Not found'], 404);
-        }
-    }
 }

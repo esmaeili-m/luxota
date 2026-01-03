@@ -16,11 +16,10 @@ class RoleTableSeeder extends Seeder
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         \Spatie\Permission\Models\Role::truncate();
         $roles = [
-            ['name' => 'Customer','guard_name' => 'api'],
-            ['name' => 'SuperAdmin','guard_name' => 'api'],
+            ['name' => 'Customer','guard_name' => 'api','created_at'=>now(), 'updated_at' => now()],
+            ['name' => 'SuperAdmin','guard_name' => 'api','created_at'=>now(), 'updated_at' => now()],
         ];
         Role::insert($roles);
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
     }
 }

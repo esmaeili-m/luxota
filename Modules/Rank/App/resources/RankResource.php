@@ -18,7 +18,7 @@ class RankResource extends JsonResource
             'status_label'=> $this->status == 1 ? 'active' : 'inactive',
             'created_at'  => $this->created_at,
             'updated_at'  => $this->updated_at,
-            'deleted_at'  => $this->deleted_at,
+            'deleted_at' => $this->deleted_at ? $this->deleted_at->format('Y / m / d') : null,
         ];
     }
-} 
+}

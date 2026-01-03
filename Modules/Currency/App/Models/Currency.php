@@ -15,6 +15,10 @@ class Currency extends Model
      */
     protected $guarded = [];
 
+    public function scopeActive($query)
+    {
+        return $query->where('status', 1);
+    }
     protected static function newFactory(): CurrencyFactory
     {
         //return CurrencyFactory::new();

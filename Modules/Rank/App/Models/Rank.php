@@ -14,10 +14,7 @@ class Rank extends Model
     /**
      * The attributes that are mass assignable.
      */
-    protected $fillable = [
-        'title',
-        'status'
-    ];
+    protected $guarded= [];
 
     /**
      * The attributes that should be cast.
@@ -33,4 +30,51 @@ class Rank extends Model
     {
         return $this->hasMany(\App\Models\User::class);
     }
+    protected static function booted()
+    {
+        static::updated(function ($rank) {
+            if ($rank->isDirty('status')) {
+                foreach ($rank->users as $user) {
+                    $user->status = $rank->status;
+                    $user->save();
+                }
+            }
+        });
+
+        static::deleted(function ($rank) {
+            foreach ($rank->users()->get() as $user) {
+                $user->delete();
+            }
+        });
+
+        static::restored(function ($rank) {
+            foreach ($rank->users()->withTrashed()->get() as $user) {
+                $user->restore();
+            }
+        });
+    }
+    public function scopeSearch($query, $fillters)
+    {
+
+        foreach ($fillters ?? [] as $filed){
+            if (!$filed) {
+                break;
+            }
+            switch ($filed) {
+                case 'title':
+                    $query->where('title', $filed);
+                    break;
+
+                case 'status':
+                    $query->where('status', $filed);
+                    break;
+
+
+            }
+        }
+
+        return $query;
+    }
+
+
 }

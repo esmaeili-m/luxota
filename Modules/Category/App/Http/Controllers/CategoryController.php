@@ -7,10 +7,12 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Modules\Category\App\Http\Requests\CreateCategoryRequest;
+use Modules\Category\App\Http\Requests\UpdateCategoryRequest;
 use Modules\Category\App\resources\CategoryCollection;
 use Modules\Category\App\resources\CategoryResource;
 use Modules\Category\App\resources\CategoryWithProductsResource;
 use Modules\Category\Services\CategoryService;
+use Modules\User\Services\UserService;
 
 /**
  * @OA\Tag(
@@ -21,39 +23,12 @@ use Modules\Category\Services\CategoryService;
 class CategoryController extends Controller
 {
     protected CategoryService $service;
+    protected UserService $userService;
 
-    public function __construct(CategoryService $service)
+    public function __construct(CategoryService $service,UserService $userService)
     {
         $this->service = $service;
-    }
-
-    /**
-     * Get all categories
-     *
-     * @OA\Get(
-     *     path="/api/v1/categories",
-     *     tags={"Categories"},
-     *     summary="Get list of categories",
-     *     description="Returns a list of categories",
-     *     operationId="getCategories",
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful operation",
-     *         @OA\JsonContent(
-     *             type="array",
-     *             @OA\Items(ref="#/components/schemas/Category")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Unauthenticated"
-     *     )
-     * )
-     */
-    public function all(): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
-    {
-        $categories = $this->service->getAll();
-        return CategoryResource::collection($categories);
+        $this->userService = $userService;
     }
 
     /**
@@ -93,9 +68,22 @@ class CategoryController extends Controller
      *     )
      * )
      */
-    public function index(CategoryService $service): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index(Request $request)
     {
-        $categories = $service->getPaginated();
+        $input = $request->only([
+            'status',
+            'title',
+            'subtitle',
+            'parent_id',
+            'per_page',
+            'paginate',
+            'sort_by',
+            'sort_direction'
+        ]);
+        $input['paginate'] = $request->boolean('paginate');
+        $input['sort_by'] = $input['sort_by'] ?? 'id';
+        $input['sort_direction'] = $input['sort_direction'] ?? 'asc';
+        $categories = $this->service->getCategories($input);
         return CategoryResource::collection($categories);
     }
 
@@ -351,7 +339,7 @@ class CategoryController extends Controller
      *     )
      * )
      */
-    public function update($id, CreateCategoryRequest $request): CategoryResource|\Illuminate\Http\JsonResponse
+    public function update($id, UpdateCategoryRequest $request): CategoryResource|\Illuminate\Http\JsonResponse
     {
         $category = $this->service->update($id, $request->validated());
         if (!$category) {
@@ -562,40 +550,6 @@ class CategoryController extends Controller
     }
 
     /**
-     * Toggle category status
-     * @OA\Patch(
-     *     path="/api/v1/categories/{id}/toggle-status",
-     *     tags={"Categories"},
-     *     summary="Toggle category active/inactive status",
-     *     description="Changes the status of a category between active and inactive",
-     *     operationId="toggleCategoryStatus",
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         description="ID of the category to toggle status",
-     *         required=true,
-     *         @OA\Schema(type="integer", example=5)
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Status changed successfully",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="Change Status successfully")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Category not found"
-     *     )
-     * )
-     */
-    public function toggle_status($id)
-    {
-        $this->service->toggle_status($id);
-        return response()->json(['message' => 'Change Status successfully']);
-    }
-
-    /**
      * Get category with its children
      * @OA\Get(
      *     path="/api/v1/categories/{id}/children",
@@ -640,6 +594,7 @@ class CategoryController extends Controller
     public function find_by_slug($slug):CategoryWithProductsResource
     {
         $data = $this->service->getCategoryWithProducts($slug);
-        return new CategoryWithProductsResource($data);
+        $user=$this->userService->getById(auth()->user()->id ?? 1);
+        return new CategoryWithProductsResource($data,$user);
     }
 }

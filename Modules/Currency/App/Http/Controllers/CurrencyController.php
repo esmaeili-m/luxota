@@ -6,15 +6,25 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Modules\Currency\App\resources\CurrencyResource;
+use Modules\Currency\Services\CurrencyService;
 
 class CurrencyController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    protected CurrencyService $service;
+
+    public function __construct(CurrencyService $service)
     {
-        return view('currency::index');
+        $this->service = $service;
+    }
+
+    /**
+     * Get all countries
+     */
+    public function all(): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    {
+        $countries = $this->service->getActive();
+        return CurrencyResource::collection($countries);
     }
 
     /**

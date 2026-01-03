@@ -12,9 +12,9 @@ class CreateZoneRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required|string|max:255|unique:zones,title,' . $this->route('zone'),
+            'title' => 'required|string|max:255|unique:zones,title' ,
             'description' => 'nullable|string|max:1000',
-            'status' => 'boolean',
+            'status' => 'in:0,1',
         ];
     }
 
@@ -38,4 +38,4 @@ class CreateZoneRequest extends FormRequest
     {
         return true;
     }
-} 
+}

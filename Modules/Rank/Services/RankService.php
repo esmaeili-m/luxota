@@ -14,14 +14,15 @@ class RankService
         $this->repo = $repo;
     }
 
-    public function getPaginated(int $perPage = 15): \Illuminate\Pagination\LengthAwarePaginator
+    public function getRanks(array $params)
     {
-        return $this->repo->paginate($perPage);
-    }
-
-    public function getAll(): \Illuminate\Database\Eloquent\Collection
-    {
-        return $this->repo->all();
+        $filters = [
+            'status' => $params['status'] ?? null,
+            'title' => $params['title'] ?? null,
+        ];
+        $perPage = $params['per_page'] ?? 15;
+        $paginate = $params['paginate'] ?? true;
+        return $this->repo->getRanks($filters, $perPage, $paginate);
     }
 
     public function getTrashedRanks(): \Illuminate\Database\Eloquent\Collection
@@ -61,11 +62,6 @@ class RankService
         return $rank->delete();
     }
 
-    public function searchByFields(array $filters): \Illuminate\Database\Eloquent\Collection|array
-    {
-        return $this->repo->searchByFields($filters);
-    }
-
     public function restoreRank($id)
     {
         $rank = $this->repo->findTrashedById($id);
@@ -78,13 +74,5 @@ class RankService
     public function forceDeleteRank($id)
     {
         $this->repo->forceDelete($id);
-    }
-
-    public function toggle_status($id)
-    {
-        $rank = $this->repo->find($id);
-        $newStatus = !$rank->status;
-        $this->repo->update($rank, ['status' => $newStatus]);
-        return response()->json(['message' => 'Change Status successfully']);
     }
 }

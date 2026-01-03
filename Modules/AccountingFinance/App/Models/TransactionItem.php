@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Modules\AccountingFinance\Database\factories\TranactionItemFactory;
 
-class TranactionItem extends Model
+class TransactionItem extends Model
 {
     use HasFactory;
     protected $table='transaction_item';

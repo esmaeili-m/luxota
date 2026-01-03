@@ -5,19 +5,22 @@ use Modules\Referrer\App\Models\Referrer;
 
 class ReferrerRepository
 {
-    public function all(): \Illuminate\Database\Eloquent\Collection
-    {
-        return Referrer::where('status',1)->get();
-    }
-
     public function getTrashedReferrers(): \Illuminate\Database\Eloquent\Collection
     {
         return Referrer::onlyTrashed()->orderBy('title')->get();
     }
 
-    public function paginate(int $perPage = 15): LengthAwarePaginator
+    public function getReferrers(array $filters = [] , $perPage = 15, $paginate = true)
     {
-        return Referrer::orderBy('title')->paginate($perPage);
+        $query = Referrer::query();
+        if (!empty($filters)) {
+            $query->search($filters);
+        }
+        if ($paginate) {
+            return $query->paginate($perPage);
+        } else {
+            return $query->get();
+        }
     }
 
     public function find(int $id, array $with = [])
@@ -56,24 +59,4 @@ class ReferrerRepository
         $referrer->forceDelete();
     }
 
-    public function searchByFields(array $filters)
-    {
-        $query = Referrer::query();
-
-        foreach ($filters as $field => $value) {
-            if (empty($value)) continue;
-
-            switch ($field) {
-                case 'title':
-                    $query->where('title', 'like', "%{$value}%");
-                    break;
-
-                case 'status':
-                    $query->where('status', $value);
-                    break;
-            }
-        }
-
-        return $query->get();
-    }
 }

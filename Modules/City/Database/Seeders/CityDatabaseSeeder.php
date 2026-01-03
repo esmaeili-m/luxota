@@ -11,6 +11,6 @@ class CityDatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-         $this->call([CityTableSeeder::class]);
+//         $this->call([CityTableSeeder::class]);
     }
 }

@@ -14,14 +14,15 @@ class ReferrerService
         $this->repo = $repo;
     }
 
-    public function getPaginated(int $perPage = 15): \Illuminate\Pagination\LengthAwarePaginator
+    public function getReferrers(array $params)
     {
-        return $this->repo->paginate($perPage);
-    }
-
-    public function getAll(): \Illuminate\Database\Eloquent\Collection
-    {
-        return $this->repo->all();
+        $filters = [
+            'status' => $params['status'] ?? null,
+            'title' => $params['title'] ?? null,
+        ];
+        $perPage = $params['per_page'] ?? 15;
+        $paginate = $params['paginate'] ?? true;
+        return $this->repo->getReferrers($filters, $perPage, $paginate);
     }
 
     public function getTrashedReferrers(): \Illuminate\Database\Eloquent\Collection
@@ -61,11 +62,6 @@ class ReferrerService
         return $referrer->delete();
     }
 
-    public function searchByFields(array $filters): \Illuminate\Database\Eloquent\Collection|array
-    {
-        return $this->repo->searchByFields($filters);
-    }
-
     public function restoreReferrer($id)
     {
         $referrer = $this->repo->findTrashedById($id);
@@ -80,11 +76,4 @@ class ReferrerService
         $this->repo->forceDelete($id);
     }
 
-    public function toggle_status($id)
-    {
-        $referrer = $this->repo->find($id);
-        $newStatus = !$referrer->status;
-        $this->repo->update($referrer, ['status' => $newStatus]);
-        return response()->json(['message' => 'Change Status successfully']);
-    }
-} 
+}

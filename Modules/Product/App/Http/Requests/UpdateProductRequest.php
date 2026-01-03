@@ -25,10 +25,8 @@ class UpdateProductRequest extends FormRequest
         return [
             'title' => 'required|array',
             'title.en' => 'required|string|max:255',
-            'title.fa' => 'required|string|max:255',
             'description' => 'required|array',
             'description.en' => 'required|string',
-            'description.fa' => 'required|string',
             'product_code' => 'nullable|integer|min:1',
             'last_version_update_date' => 'nullable|date',
             'version' => 'nullable|numeric|min:0',

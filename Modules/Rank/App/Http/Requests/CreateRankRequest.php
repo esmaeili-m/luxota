@@ -12,8 +12,8 @@ class CreateRankRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required|string|max:255|unique:ranks,title,' . $this->route('rank'),
-            'status' => 'boolean',
+            'title' => 'required|string|max:255|unique:ranks,title',
+            'status' => 'in:0,1',
         ];
     }
 
@@ -35,4 +35,4 @@ class CreateRankRequest extends FormRequest
     {
         return true;
     }
-} 
+}

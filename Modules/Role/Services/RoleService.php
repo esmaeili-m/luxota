@@ -15,14 +15,15 @@ class RoleService
         $this->repo = $repo;
     }
 
-    public function getPaginated(int $perPage = 15): \Illuminate\Pagination\LengthAwarePaginator
+    public function getRoles(array $params)
     {
-        return $this->repo->paginate($perPage);
-    }
-
-    public function getAll(): \Illuminate\Database\Eloquent\Collection
-    {
-        return $this->repo->all();
+        $filters = [
+            'status' => $params['status'] ?? null,
+            'name' => $params['name'] ?? null,
+        ];
+        $perPage = $params['per_page'] ?? 15;
+        $paginate = $params['paginate'] ?? true;
+        return $this->repo->getRoles($filters, $perPage);
     }
 
     public function getTrashedRoles(): \Illuminate\Pagination\LengthAwarePaginator
@@ -67,11 +68,6 @@ class RoleService
         return $role->delete();
     }
 
-    public function searchByFields(array $filters): \Illuminate\Database\Eloquent\Collection|array
-    {
-        return $this->repo->searchByFields($filters);
-    }
-
     public function restoreRole($id)
     {
         $role = $this->repo->findTrashedById($id);
@@ -86,12 +82,4 @@ class RoleService
         $this->repo->forceDelete($id);
     }
 
-    public function toggle_status($id)
-    {
-        $role = $this->repo->find($id);
-        $newStatus = !$role->status;
-        $this->repo->update($role, ['status' => $newStatus]);
-        return response()->json(['message' => 'Change Status successfully']);
-
-    }
 }

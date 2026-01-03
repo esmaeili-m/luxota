@@ -15,5 +15,6 @@
     "ActivityLog": true,
     "Price": true,
     "AccountingFinance": true,
-    "Currency": true
+    "Currency": true,
+    "Support": true
 }

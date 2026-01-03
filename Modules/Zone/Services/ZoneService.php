@@ -14,14 +14,16 @@ class ZoneService
         $this->repo = $repo;
     }
 
-    public function getPaginated(int $perPage = 15): \Illuminate\Pagination\LengthAwarePaginator
+    public function getZones(array $params)
     {
-        return $this->repo->paginate($perPage);
-    }
-
-    public function getAll(): \Illuminate\Database\Eloquent\Collection
-    {
-        return $this->repo->all();
+        $filters = [
+            'status' => $params['status'] ?? null,
+            'title' => $params['title'] ?? null,
+            'description' => $params['description'] ?? null,
+        ];
+        $perPage = $params['per_page'] ?? 15;
+        $paginate = $params['paginate'] ?? true;
+        return $this->repo->getZones($filters, $perPage, $paginate);
     }
 
     public function getTrashedZones(): \Illuminate\Database\Eloquent\Collection
@@ -61,11 +63,6 @@ class ZoneService
         return $zone->delete();
     }
 
-    public function searchByFields(array $filters): \Illuminate\Database\Eloquent\Collection|array
-    {
-        return $this->repo->searchByFields($filters);
-    }
-
     public function restoreZone($id)
     {
         $zone = $this->repo->findTrashedById($id);
@@ -80,11 +77,4 @@ class ZoneService
         $this->repo->forceDelete($id);
     }
 
-    public function toggle_status($id)
-    {
-        $zone = $this->repo->find($id);
-        $newStatus = !$zone->status;
-        $this->repo->update($zone, ['status' => $newStatus]);
-        return response()->json(['message' => 'Change Status successfully']);
-    }
 }

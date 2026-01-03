@@ -64,7 +64,7 @@ class Product extends Model
 
     public function active_item()
     {
-        return $this->hasOne(InvoiceItem::class)->where('status',0)->where('user_id',auth()->user()->id);
+        return $this->hasOne(InvoiceItem::class)->where('status',0)->where('user_id',auth()?->user()?->id);
     }
     public function author()
     {

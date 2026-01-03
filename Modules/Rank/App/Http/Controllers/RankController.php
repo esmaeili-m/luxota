@@ -5,6 +5,7 @@ namespace Modules\Rank\App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Modules\Rank\App\Http\Requests\CreateRankRequest;
+use Modules\Rank\App\Http\Requests\UpdateRankRequest;
 use Modules\Rank\App\resources\RankCollection;
 use Modules\Rank\App\resources\RankResource;
 use Modules\Rank\Services\RankService;
@@ -22,35 +23,6 @@ class RankController extends Controller
     public function __construct(RankService $service)
     {
         $this->service = $service;
-    }
-
-    /**
-     * Get all ranks
-     *
-     * @OA\Get(
-     *     path="/api/v1/ranks/all",
-     *     tags={"Ranks"},
-     *     summary="Get all ranks",
-     *     description="Returns a list of all ranks",
-     *     operationId="getAllRanks",
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful operation",
-     *         @OA\JsonContent(
-     *             type="array",
-     *             @OA\Items(ref="#/components/schemas/Rank")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Unauthenticated"
-     *     )
-     * )
-     */
-    public function all(): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
-    {
-        $ranks = $this->service->getAll();
-        return RankResource::collection($ranks);
     }
 
     /**
@@ -90,9 +62,9 @@ class RankController extends Controller
      *     )
      * )
      */
-    public function index(): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
-        $ranks = $this->service->getPaginated();
+        $ranks = $this->service->getRanks($request->only(['status','title','per_page','paginate']));
         return RankResource::collection($ranks);
     }
 
@@ -237,7 +209,7 @@ class RankController extends Controller
      *     )
      * )
      */
-    public function update($id, CreateRankRequest $request): RankResource|\Illuminate\Http\JsonResponse
+    public function update($id, UpdateRankRequest $request): RankResource|\Illuminate\Http\JsonResponse
     {
         $rank = $this->service->update($id, $request->validated());
 
@@ -472,52 +444,4 @@ class RankController extends Controller
         return RankResource::collection($ranks);
     }
 
-    /**
-     * Toggle rank status
-     *
-     * @OA\Post(
-     *     path="/api/v1/ranks/{id}/toggle-status",
-     *     tags={"Ranks"},
-     *     summary="Toggle rank status",
-     *     description="Toggles the status of a rank between active and inactive",
-     *     operationId="toggleRankStatus",
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         required=true,
-     *         @OA\Schema(type="integer", example=1),
-     *         description="The ID of the rank to toggle status"
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Status changed successfully",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="message", type="string", example="Change Status successfully")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Rank not found",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="error", type="string", example="Not found")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Unauthenticated"
-     *     )
-     * )
-     */
-    public function toggle_status($id): RankResource|\Illuminate\Http\JsonResponse
-    {
-        try {
-            $this->service->toggle_status($id);
-            $rank = $this->service->getById($id);
-            return new RankResource($rank);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Not found'], 404);
-        }
-    }
 }

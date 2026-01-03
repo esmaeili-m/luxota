@@ -31,9 +31,30 @@ class Invoice extends Model
         return $this->hasMany(InvoiceItem::class);
     }
 
-
-    protected static function newFactory(): InvoiceFactory
+    public function transactions_item()
     {
-        //return InvoiceFactory::new();
+        return $this->hasMany(TransactionItem::class);
     }
+    public function scopeSearch($query, $filters)
+    {
+        foreach ($filters ?? [] as $field => $value) {
+            if ($value === null || $value === '') {
+                break;
+            }
+
+            switch ($field) {
+
+                case 'invoice_code':
+                    $query->where('mahdi', $value);
+                    break;
+                case 'status':
+                    $query->where('status', $value);
+                    break;
+            }
+        }
+
+        return $query;
+
+    }
+
 }

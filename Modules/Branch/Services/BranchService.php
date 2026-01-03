@@ -14,9 +14,15 @@ class BranchService
         $this->repo = $repo;
     }
 
-    public function getPaginated(int $perPage = 15): \Illuminate\Pagination\LengthAwarePaginator
+    public function getBranches(array $params)
     {
-        return $this->repo->paginate($perPage);
+        $filters = [
+            'status' => $params['status'] ?? null,
+            'title' => $params['title'] ?? null,
+        ];
+        $perPage = $params['per_page'] ?? 15;
+        $paginate = $params['paginate'] ?? true;
+        return $this->repo->getBranches($filters, $perPage, $paginate);
     }
 
     public function getAll(): \Illuminate\Database\Eloquent\Collection
@@ -61,11 +67,6 @@ class BranchService
         return $branch->delete();
     }
 
-    public function searchByFields(array $filters): \Illuminate\Database\Eloquent\Collection|array
-    {
-        return $this->repo->searchByFields($filters);
-    }
-
     public function restoreBranch($id)
     {
         $branch = $this->repo->findTrashedById($id);
@@ -79,12 +80,4 @@ class BranchService
     {
         $this->repo->forceDelete($id);
     }
-
-    public function toggle_status($id)
-    {
-        $branch = $this->repo->find($id);
-        $newStatus = !$branch->status;
-        $this->repo->update($branch, ['status' => $newStatus]);
-        return response()->json(['message' => 'Change Status successfully']);
-    }
-} 
+}

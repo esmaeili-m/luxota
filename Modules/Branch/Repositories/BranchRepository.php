@@ -5,21 +5,24 @@ use Modules\Branch\App\Models\Branch;
 
 class BranchRepository
 {
-    public function all(): \Illuminate\Database\Eloquent\Collection
-    {
-        return Branch::where('status',1)->get();
-    }
 
     public function getTrashedBranches(): \Illuminate\Database\Eloquent\Collection
     {
         return Branch::onlyTrashed()->orderBy('title')->get();
     }
 
-    public function paginate(int $perPage = 15): LengthAwarePaginator
+    public function getBranches(array $filters = [] , $perPage = 15, $paginate = true)
     {
-        return Branch::orderBy('title')->paginate($perPage);
+        $query = Branch::query();
+        if (!empty($filters)) {
+            $query->search($filters);
+        }
+        if ($paginate) {
+            return $query->paginate($perPage);
+        } else {
+            return $query->get();
+        }
     }
-
     public function find(int $id, array $with = [])
     {
         return Branch::with($with)->findOrFail($id);
@@ -56,24 +59,4 @@ class BranchRepository
         $branch->forceDelete();
     }
 
-    public function searchByFields(array $filters)
-    {
-        $query = Branch::query();
-
-        foreach ($filters as $field => $value) {
-            if (empty($value)) continue;
-
-            switch ($field) {
-                case 'title':
-                    $query->where('title', 'like', "%{$value}%");
-                    break;
-
-                case 'status':
-                    $query->where('status', $value);
-                    break;
-            }
-        }
-
-        return $query->get();
-    }
 }

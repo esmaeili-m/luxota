@@ -25,11 +25,15 @@ class CountryResource extends JsonResource
             'phone_code' => $this->phone_code,
             'flag' => $this->flag,
             'zone_id' => $this->zone_id,
-            'currency_id' => $this->currency_id,
+            'currency' => $this->whenLoaded('currency',function ($currency){
+                return [
+                    'en'=> $this->currency?->title
+                ];
+            }),
             'status' => $this->status,
             'display_name' => $this->display_name,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
     }
-} 
+}

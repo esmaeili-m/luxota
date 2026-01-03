@@ -37,7 +37,6 @@ class ProductResource extends JsonResource
                     'per_month' => ($basePrice * 6 * 0.55) / 6,
                 ],
             ];
-
             foreach ($plans  as $key => $plan) {
                 $plans[$key]['total'] = (string) $currencyService->convertFromUsd($plan['total'], $currency);
                 $plans[$key]['per_month'] = (string) $currencyService->convertFromUsd($plan['per_month'], $currency);
@@ -82,7 +81,7 @@ class ProductResource extends JsonResource
             'category_id' => $this->category_id,
             'category'    => new \Modules\Category\App\resources\CategoryResource($this->whenLoaded('category')),
             'plans' => $plans ?? [],
-            'currency' => $currency->code ?? 'USD',
+            'currency' => $currency->abb ?? 'USD',
             'created_at'  => $this->created_at?->format('Y-m-d H:i:s'),
             'updated_at'  => $this->updated_at?->format('Y-m-d H:i:s'),
 

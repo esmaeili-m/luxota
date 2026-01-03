@@ -12,6 +12,8 @@ class ReferrerSeeder extends Seeder
      */
     public function run(): void
     {
+        Referrer::Truncate();
+
         $referrers = [
             ['title' => 'Website', 'status' => true],
             ['title' => 'Social Media', 'status' => true],
@@ -29,4 +31,4 @@ class ReferrerSeeder extends Seeder
             Referrer::create($referrer);
         }
     }
-} 
+}

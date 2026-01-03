@@ -5,19 +5,23 @@ use Modules\Zone\App\Models\Zone;
 
 class ZoneRepository
 {
-    public function all(): \Illuminate\Database\Eloquent\Collection
-    {
-        return Zone::get();
-    }
 
     public function getTrashedZones(): \Illuminate\Database\Eloquent\Collection
     {
         return Zone::onlyTrashed()->get();
     }
 
-    public function paginate(int $perPage = 15): LengthAwarePaginator
+    public function getZones(array $filters = [] , $perPage = 15, $paginate = true)
     {
-        return Zone::paginate($perPage);
+        $query = Zone::query();
+        if (!empty($filters)) {
+            $query->search($filters);
+        }
+        if ($paginate) {
+            return $query->paginate($perPage);
+        } else {
+            return $query->get();
+        }
     }
 
     public function find(int $id, array $with = [])
@@ -56,28 +60,4 @@ class ZoneRepository
         $zone->forceDelete();
     }
 
-    public function searchByFields(array $filters)
-    {
-        $query = Zone::query();
-
-        foreach ($filters as $field => $value) {
-            if (empty($value)) continue;
-
-            switch ($field) {
-                case 'title':
-                    $query->where('title', 'like', "%{$value}%");
-                    break;
-
-                case 'description':
-                    $query->where('description', 'like', "%{$value}%");
-                    break;
-
-                case 'status':
-                    $query->where('status', $value);
-                    break;
-            }
-        }
-
-        return $query->get();
-    }
 }

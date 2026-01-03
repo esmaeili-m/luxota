@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -23,6 +24,9 @@ return new class extends Migration
             $table->decimal('exchange_rate', 15, 6)->nullable();
             $table->decimal('total', 15, 2)->default(0);
             $table->decimal('total_base', 15, 2)->default(0);
+            $table->decimal('tax_percent', 5, 2)->default(0);
+            $table->decimal('tax_amount', 15, 2)->default(0);
+            $table->decimal('tax_amount_base', 15, 2)->default(0);
             $table->text('remark')->nullable();
             $table->timestamps();
         });

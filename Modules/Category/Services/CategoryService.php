@@ -17,9 +17,23 @@ class CategoryService
         $this->repo = $repo;
     }
 
-    public function getPaginated(int $perPage = 15): \Illuminate\Pagination\LengthAwarePaginator
+    public function getCategories(array $params)
     {
-        return $this->repo->paginate($perPage);
+        $filters = [
+            'status'   => $params['status'] ?? null,
+            'parent_id'    => $params['parent_id'] ?? null,
+            'title'    => $params['title'] ?? null,
+            'subtitle' => $params['subtitle'] ?? null,
+        ];
+
+        $sort = [
+            'by'        => $params['sort_by'] ?? 'id',
+            'direction' => $params['sort_direction'] ?? 'asc',
+        ];
+
+        $perPage  = $params['per_page'] ?? 15;
+        $paginate = $params['paginate'] ?? true;
+        return $this->repo->getCategories($filters, $perPage, $paginate, $sort);
     }
 
     public function getAll(): \Illuminate\Database\Eloquent\Collection

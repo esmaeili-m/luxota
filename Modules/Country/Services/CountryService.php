@@ -13,6 +13,18 @@ class CountryService
         $this->repo = $repo;
     }
 
+    public function update($id,$data)
+    {
+        $country = $this->repo->find($id);
+
+        if (!$country) {
+            return null;
+        }
+
+        $this->repo->update($country, $data);
+
+        return $country->fresh();
+    }
     public function getAll(): \Illuminate\Database\Eloquent\Collection
     {
         return $this->repo->all();
@@ -22,9 +34,19 @@ class CountryService
     {
         return $this->repo->getActive();
     }
-    public function getPaginated(int $perPage = 15): \Illuminate\Pagination\LengthAwarePaginator
+    public function getCountries(array $params)
     {
-        return $this->repo->paginate($perPage);
+        $filters = [
+            'status' => $params['status'] ?? null,
+            'en' => $params['en'] ?? null,
+            'abb' => $params['abb'] ?? null,
+            'phone_code' => $params['phone_code'] ?? null,
+            'zone_id' => $params['zone_id'] ?? null,
+            'currency_id' => $params['currency_id'] ?? null,
+        ];
+        $perPage = $params['per_page'] ?? 15;
+        $paginate = $params['paginate'] ?? true;
+        return $this->repo->getCountries($filters, $perPage, $paginate);
     }
 
     public function find($id)

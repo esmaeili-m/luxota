@@ -5,19 +5,26 @@ use Spatie\Permission\Models\Role;
 
 class RoleRepository
 {
-    public function all(): \Illuminate\Database\Eloquent\Collection
+
+    public function getTrashedRoles($perPage = 15):LengthAwarePaginator
     {
-        return Role::where('status',1)->get();
+        return Role::onlyTrashed()->paginate($perPage);
     }
 
-    public function getTrashedRoles():LengthAwarePaginator
+    public function getRoles(array $filters = [] , $perPage = 15, $paginate = false)
     {
-        return Role::onlyTrashed()->paginate(15);
-    }
-
-    public function paginate(int $perPage = 15): LengthAwarePaginator
-    {
-        return Role::paginate($perPage);
+        $query = Role::query();
+        if (!empty($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
+        if (!empty($filters['role'])) {
+            $query->where('role', $filters['role']);
+        }
+        if ($paginate) {
+            return $query->paginate($perPage);
+        } else {
+            return $query->get();
+        }
     }
 
     public function find(int $id, array $with = [])
@@ -61,24 +68,4 @@ class RoleRepository
         $role->forceDelete();
     }
 
-    public function searchByFields(array $filters)
-    {
-        $query = Role::query();
-
-        foreach ($filters as $field => $value) {
-            if (empty($value)) continue;
-
-            switch ($field) {
-                case 'name':
-                    $query->where('name', 'like', "%{$value}%");
-                    break;
-
-                case 'status':
-                    $query->where('status', $value);
-                    break;
-            }
-        }
-
-        return $query->get();
-    }
 }

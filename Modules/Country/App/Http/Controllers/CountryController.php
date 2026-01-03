@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Modules\Country\App\Http\Requests\CreateCountryRequest;
+use Modules\Country\App\Http\Requests\UpdateCountryRequest;
 use Modules\Country\App\resources\CountryResource;
 use Modules\Country\Services\CountryService;
 
@@ -18,106 +20,25 @@ class CountryController extends Controller
         $this->service = $service;
     }
 
-    /**
-     * Get all countries
-     */
-    public function all(): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index(Request $request)
     {
-        $countries = $this->service->getActive();
-        return CountryResource::collection($countries);
-    }
-
-
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        $countries = $this->service->getPaginated();
+        $input = $request->only($request->only(['status','en','abb','phone_code','zone_id','currency_id','per_page','paginate']));
+        $input['paginate'] = !$request->has('paginate') || $request->boolean('paginate');
+        $countries = $this->service->getCountries($input);
         return CountryResource::collection($countries);
 
 
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function update(UpdateCountryRequest $request, $id): CountryResource
     {
-        return view('country::create');
+        $country = $this->service->update($id, $request->validated());
+
+        if (!$country) {
+            return response()->json(['error' => 'Not found'], 404);
+        }
+        return new CountryResource($country);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request): RedirectResponse
-    {
-        //
-    }
 
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
-    {
-        return view('country::show');
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
-    {
-        return view('country::edit');
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id): RedirectResponse
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id)
-    {
-        $country = $this->service->find($id);
-        $country->delete();
-        return response()->json(['message' => 'Country moved to trash successfully']);
-    }
-    public function toggle_status($id)
-    {
-        $category = $this->service->toggle_status($id);
-        return response()->json(['message' => 'Change Status successfully']);
-    }
-
-    /**
-     * Display a listing of trashed countries.
-     */
-    public function trash()
-    {
-        $countries = $this->service->getTrashed();
-        return CountryResource::collection($countries);
-    }
-
-    /**
-     * Restore the specified country from trash.
-     */
-    public function restore($id)
-    {
-        $country = $this->service->restore($id);
-        return response()->json(['message' => 'Country restored successfully']);
-    }
-
-    /**
-     * Permanently delete the specified country.
-     */
-    public function forceDelete($id)
-    {
-        $this->service->forceDelete($id);
-        return response()->json(['message' => 'Country permanently deleted']);
-    }
 }

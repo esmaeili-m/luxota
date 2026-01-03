@@ -20,6 +20,11 @@ class UserVoucher extends Model
     {
         return $this->belongsTo(Voucher::class);
     }
+
+    public function transactions_temp()
+    {
+        return $this->hasMany(TransactionItem::class,'voucher_id','voucher_id');
+    }
     protected static function newFactory(): UserVoucherFactory
     {
         //return UserVoucherFactory::new();

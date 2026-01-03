@@ -26,14 +26,8 @@ Route::prefix('v1')
         // ------------------------------
         // Zone extra routes
         // ------------------------------
-        Route::get('zones/all', [ZoneController::class, 'all'])
-            ->middleware('permission:zone.index');
-
         Route::get('zones/trash', [ZoneController::class, 'trash'])
             ->middleware('permission:zone.trash');
-
-        Route::get('zones/search', [ZoneController::class, 'search'])
-            ->middleware('permission:zone.index');
 
         Route::delete('zones/force-delete/{id}', [ZoneController::class, 'forceDelete'])
             ->middleware('permission:zone.delete');
@@ -41,8 +35,6 @@ Route::prefix('v1')
         Route::post('zones/{id}/restore', [ZoneController::class, 'restore'])
             ->middleware('permission:zone.restore');
 
-        Route::post('zones/{id}/toggle-status', [ZoneController::class, 'toggle_status'])
-            ->middleware('permission:zone.update');
 
         // ------------------------------
         // Zone resource routes
