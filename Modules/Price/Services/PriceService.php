@@ -30,4 +30,26 @@ class PriceService
         }
         return $price->delete();
     }
+
+    public function update($data)
+    {
+        $rows = [];
+
+        foreach ($data as $item) {
+            // validation ساده
+            if (!isset($item['product_id'], $item['zone_id'], $item['amount'])) {
+                continue;
+            }
+
+            $rows[] = [
+                'product_id' => $item['product_id'],
+                'zone_id'    => $item['zone_id'],
+                'price'      => $item['amount'],
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        return $this->repo->update($rows);
+    }
 }

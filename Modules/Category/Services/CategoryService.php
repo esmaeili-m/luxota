@@ -17,28 +17,13 @@ class CategoryService
         $this->repo = $repo;
     }
 
-    public function getCategories(array $params)
+    public function getCategories(array $filters)
     {
-        $filters = [
-            'status'   => $params['status'] ?? null,
-            'parent_id'    => $params['parent_id'] ?? null,
-            'title'    => $params['title'] ?? null,
-            'subtitle' => $params['subtitle'] ?? null,
-        ];
+        $perPage = $filters['per_page'] ?? 15;
+        $page = $filters['page'] ?? 1;
+        $paginate = $filters['paginate'] ?? true;
 
-        $sort = [
-            'by'        => $params['sort_by'] ?? 'id',
-            'direction' => $params['sort_direction'] ?? 'asc',
-        ];
-
-        $perPage  = $params['per_page'] ?? 15;
-        $paginate = $params['paginate'] ?? true;
-        return $this->repo->getCategories($filters, $perPage, $paginate, $sort);
-    }
-
-    public function getAll(): \Illuminate\Database\Eloquent\Collection
-    {
-        return $this->repo->all();
+        return $this->repo->getCategories($filters, $perPage, $page, $paginate);
     }
 
     public function getTrashedCategories(): \Illuminate\Database\Eloquent\Collection
@@ -107,11 +92,6 @@ class CategoryService
         return response()->json(['message' => 'Category soft deleted successfully']);
     }
 
-    public function searchByFields(array $filters): \Illuminate\Database\Eloquent\Collection|array
-    {
-        return $this->repo->searchByFields($filters);
-    }
-
     public function restoreCategory($id)
     {
         $category = $this->repo->findTrashedById($id);
@@ -124,18 +104,6 @@ class CategoryService
     public function forceDeleteCategory($id)
     {
         $this->repo->forceDelete($id);
-    }
-
-    public function toggle_status($id)
-    {
-        $category = $this->repo->find($id);
-        $newStatus = !$category->status;
-        return $this->repo->update($category, ['status' => $newStatus]);
-    }
-
-    public function getChildrenCategory(int $id ,int $perPage= 15): LengthAwarePaginator
-    {
-        return $this->repo->getChildrenCategory($id, $perPage= 15);
     }
 
     protected function generateUniqueSlug($slug)
@@ -156,13 +124,7 @@ class CategoryService
         return $this->repo->getBySlug($slug);
 
     }
-    public function getCategoryWithProducts($slug)
-    {
-        $category = $this->repo->getBySlug($slug);
-        $products = $this->repo->getAllProducts($category);
 
-        return compact('category', 'products');
-    }
 
 
 }

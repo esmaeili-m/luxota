@@ -37,56 +37,37 @@ class TicketController extends Controller
         $ticket=$this->service->get_ticket_by_id($id);
         return new TicketResource($ticket);
     }
-    public function index()
+
+    public function ticket_count()
     {
-        return view('support::index');
+        return $this->service->ticket_count();
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function get_tickets(Request $request)
     {
-        return view('support::create');
+        $tickets = $this->service->get_tickets($request->only(['status','content','code','user_id']));
+        return TicketResource::collection($tickets);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request): RedirectResponse
+    public function update(Request $request, $id)
     {
-        //
+        $data = $request->only(['subject','status']);
+
+        $ticket = $this->service->update($id, $data);
+
+        return response()->json([
+            'message' => 'Status updated successfully',
+            'data' => $ticket,
+        ]);
     }
 
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
+    public function destroy($id): \Illuminate\Http\JsonResponse
     {
-        return view('support::show');
-    }
+        $deleted = $this->service->delete($id);
+        if (!$deleted) {
+            return response()->json(['error' => 'Not found'], 404);
+        }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
-    {
-        return view('support::edit');
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id): RedirectResponse
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id)
-    {
-        //
+        return response()->json(['message' => 'Message deleted successfully']);
     }
 }

@@ -16,5 +16,6 @@
     "Price": true,
     "AccountingFinance": true,
     "Currency": true,
-    "Support": true
+    "Support": true,
+    "Notification": true
 }

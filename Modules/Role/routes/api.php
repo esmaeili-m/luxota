@@ -15,36 +15,35 @@ use Modules\Role\App\Http\Controllers\RoleController;
     |
 */
 
-Route::prefix('v1')
+Route::prefix('v1/roles')
     ->name('api.v1.')
     ->middleware(['auth:sanctum'])
     ->group(function () {
-        Route::get('roles', [RoleController::class, 'index'])
-            ->name('roles.index')
+        Route::get('/', [RoleController::class, 'index'])
             ->middleware('permission:role.index');
 
-        Route::post('roles', [RoleController::class, 'store'])
-            ->name('roles.store')
+        Route::post('/', [RoleController::class, 'store'])
             ->middleware('permission:role.create');
 
-        Route::get('roles/trash', [RoleController::class, 'trash'])
+        Route::get('/trash', [RoleController::class, 'trash'])
             ->middleware('permission:role.trash');
 
-        Route::get('roles/{role}', [RoleController::class, 'show'])
-            ->name('roles.show')
+        Route::get('/{role}', [RoleController::class, 'show'])
             ->middleware('permission:role.index');
 
-        Route::patch('roles/{role}', [RoleController::class, 'update'])
+        Route::put('/{role}', [RoleController::class, 'update'])
             ->middleware('permission:role.update');
 
-        Route::delete('roles/{role}', [RoleController::class, 'destroy'])
-            ->name('roles.destroy')
+        Route::delete('/{role}', [RoleController::class, 'destroy'])
             ->middleware('permission:role.delete');
 
-        Route::delete('roles/force-delete/{id}', [RoleController::class, 'forceDelete'])
+        Route::delete('/force-delete/{id}', [RoleController::class, 'forceDelete'])
             ->middleware('permission:role.delete');
 
-        Route::post('roles/{id}/restore', [RoleController::class, 'restore'])
+        Route::post('/{id}/restore', [RoleController::class, 'restore'])
+            ->middleware('permission:role.restore');
+
+        Route::post('/{id}/assign-permissions', [RoleController::class, 'assignPermissions'])
             ->middleware('permission:role.restore');
 
 

@@ -144,9 +144,15 @@ class UserController extends Controller
      *     )
      * )
      */
-    public function index(): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index1(): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
         $users = $this->service->getPaginated();
+        return UserResource::collection($users);
+    }
+
+    public function index(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    {
+        $users = $this->service->getUsers($request->only(['status','name','per_page','paginate']));
         return UserResource::collection($users);
     }
 

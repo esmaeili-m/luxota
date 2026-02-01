@@ -27,9 +27,9 @@ class RoleRepository
         }
     }
 
-    public function find(int $id, array $with = [])
+    public function find(int $id, array $with = ['permissions'])
     {
-        return Role::with($with)->findOrFail($id);
+        return Role::with(['permissions'])->findOrFail($id);
     }
 
     public function findByName(string $name): Role

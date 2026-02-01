@@ -6,30 +6,26 @@ use Modules\Product\App\Models\Product;
 
 class CategoryRepository
 {
-    public function all(): \Illuminate\Database\Eloquent\Collection
-    {
-        return Category::orderBy('order')->where('status',1)->get();
-    }
-    public function getTrashedCategories(): \Illuminate\Database\Eloquent\Collection
-    {
-        return Category::onlyTrashed()->orderBy('order')->get();
-    }
 
-    public function getCategories(array $filters = [], $perPage = 15, $paginate = true, $sort = ['by' => 'id', 'direction' => 'asc'])
+
+    public function getCategories(array $filters = [], $perPage = 15, $page = 1, $paginate = true)
     {
         $query = Category::query();
-
+        if (isset($filters['with'])) {
+            $query->with([$filters['with']]);
+        }
         if (!empty($filters)) {
             $query->search($filters);
         }
 
-        if (!empty($sort['by']) && !empty($sort['direction'])) {
-            $query->orderBy($sort['by'], $sort['direction']);
-        }
-
         return $paginate
-            ? $query->paginate($perPage)
+            ? $query->paginate($perPage, ['*'], 'page', $page)
             : $query->get();
+    }
+
+    public function getTrashedCategories(): \Illuminate\Database\Eloquent\Collection
+    {
+        return Category::onlyTrashed()->orderBy('order')->get();
     }
 
     public function find(int $id, array $with = [])
@@ -69,12 +65,6 @@ class CategoryRepository
         $category->forceDelete();
     }
 
-
-    public function getChildrenCategory(int $id,int $perPage= 15):LengthAwarePaginator
-    {
-        return Category::where('parent_id',$id)->paginate($perPage);
-    }
-
     public function getNextCategoryCode()
     {
         return Category::max('category_code') + 1;
@@ -95,14 +85,6 @@ class CategoryRepository
         return Category::where('slug',$slug)->where('status',1)->with(['children' => function($childern){
             $childern->where('status',1);
         }])->first();
-    }
-
-    public function getAllProducts(Category $category)
-    {
-        $ids = $this->getAllCategoryIds($category);
-        return Product::whereIn('category_id', $ids)->where('status',1)->with(['category' => function($query){
-            $query->select('id', 'title');
-        }])->get();
     }
 
     private function getAllCategoryIds(Category $category)

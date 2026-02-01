@@ -48,36 +48,32 @@ class Category extends Model
     public function scopeSearch($query, $filters)
     {
         foreach ($filters ?? [] as $field => $value) {
-            if ($value === null || $value === '') {
-                continue;
-            }
-
             switch ($field) {
 
-                case 'title':
-                    $query->where('title', $value);
+                case 'content':
+                    $query->where(function($q) use ($value) {
+                        $q->where('title', 'like', "%{$value}%")
+                            ->orWhere('subtitle', 'like', "%{$value}%");
+                    });
                     break;
 
                 case 'parent_id':
                     if ($value === 'null' || $value === null) {
                         $query->whereNull('parent_id');
+                    }elseif ($value === 'notNull') {
+                        $query->whereNotNull('parent_id');
                     } else {
                         $query->where('parent_id', $value);
                     }
                     break;
 
-                case 'subtitle':
-                    $query->where('subtitle', 'like', "%{$value}%");
-                    break;
-
                 case 'status':
-                    $query->where('status', $value);
+                    $query->where('status', (int)$value);
                     break;
             }
         }
 
         return $query;
-
     }
 
 }

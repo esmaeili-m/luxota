@@ -31,6 +31,9 @@ Route::prefix('v1')
         Route::post('prices', [\Modules\Price\App\Http\Controllers\PriceController::class, 'store'])
             ->middleware('permission:product.price');
 
+        Route::post('prices', [\Modules\Price\App\Http\Controllers\PriceController::class, 'update'])
+            ->middleware('permission:product.price');
+
         Route::delete('prices/{id}', [\Modules\Price\App\Http\Controllers\PriceController::class, 'destroy'])
             ->middleware('permission:product.price');
     });

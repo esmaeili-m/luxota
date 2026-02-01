@@ -6,17 +6,31 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Modules\Permission\App\resources\PermissionResource;
+use Modules\Permission\Services\PermissionService;
 
 class PermissionController extends Controller
 {
+    public PermissionService $service;
+
+    public function __construct(PermissionService $service)
+    {
+        $this->service= $service;
+    }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return view('permission::index');
+        $permissions=$this->service->get_permissions();
+        return PermissionResource::collection($permissions);
     }
 
+    public function getGroupedPermissions()
+    {
+        $permissions=$this->service->getGroupedPermissions();
+        return PermissionResource::collection($permissions);
+    }
     /**
      * Show the form for creating a new resource.
      */

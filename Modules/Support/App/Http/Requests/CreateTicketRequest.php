@@ -12,11 +12,15 @@ class CreateTicketRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'subject' => 'required|string|max:255',
-            'message' => 'nullable|string',
+            'ticket_id' => 'nullable|exists:tickets,id',
+            'subject' => 'required_without:ticket_id|string|max:255',
+            'message' => 'required_if:ticket_id,!=,null|nullable|string',
             'attachments' => 'nullable|array',
+            'status' => 'nullable|string',
             'attachments.*' => 'file|mimes:pdf,doc,docx,jpg,png,webp|max:10240',
         ];
+
+
 
     }
 

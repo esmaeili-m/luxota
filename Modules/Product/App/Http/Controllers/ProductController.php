@@ -28,34 +28,6 @@ class ProductController extends Controller
         $this->service = $service;
     }
 
-    /**
-     * Get all products
-     *
-     * @OA\Get(
-     *     path="/api/v1/products/all",
-     *     tags={"Products"},
-     *     summary="Get list of all products",
-     *     description="Returns a list of all products with their categories",
-     *     operationId="getAllProducts",
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful operation",
-     *         @OA\JsonContent(
-     *             type="array",
-     *             @OA\Items(ref="#/components/schemas/Product")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Unauthenticated"
-     *     )
-     * )
-     */
-    public function all(): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
-    {
-        $products = $this->service->getAll();
-        return ProductResource::collection($products);
-    }
 
     /**
      * Get all products with pagination
@@ -94,9 +66,19 @@ class ProductController extends Controller
      *     )
      * )
      */
-    public function index(ProductService $service): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
-        $products = $service->getPaginated();
+        $input = $request->only([
+            'status',
+            'content',
+            'with',
+            'category_id',
+        ]);
+
+        $input['paginate'] = $request->boolean('paginate', true);
+        $input['page'] = $request->input('page', 1);
+        $input['per_page'] = $request->input('per_page', 10);
+        $products = $this->service->getProducts($input);
         return ProductResource::collection($products);
     }
 
@@ -142,56 +124,6 @@ class ProductController extends Controller
     public function show($id): ProductResource|\Illuminate\Http\JsonResponse
     {
         $product = $this->service->getById($id);
-
-        if (!$product) {
-            return response()->json(['error' => 'Not found'], 404);
-        }
-
-        return new ProductResource($product);
-    }
-
-    /**
-     * Get a Product by ID with its category
-     *
-     * @OA\Get(
-     *     path="/api/v1/products/{id}/with-category",
-     *     tags={"Products"},
-     *     summary="Get product with its category",
-     *     description="Returns a product by ID along with its category details",
-     *     operationId="getProductWithCategory",
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         required=true,
-     *         description="The ID of the product to retrieve along with its category",
-     *         @OA\Schema(type="integer", example=1)
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful operation",
-     *         @OA\JsonContent(ref="#/components/schemas/Product")
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Product not found",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="error", type="string", example="Not found")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Unauthenticated",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="message", type="string", example="Unauthenticated.")
-     *         )
-     *     )
-     * )
-     */
-    public function showWithCategory($id): ProductResource|\Illuminate\Http\JsonResponse
-    {
-        $product = $this->service->getById($id, ['category']);
 
         if (!$product) {
             return response()->json(['error' => 'Not found'], 404);
@@ -396,68 +328,6 @@ class ProductController extends Controller
     }
 
     /**
-     * Search products by various fields
-     *
-     * @OA\Get(
-     *     path="/api/v1/products/search",
-     *     tags={"Products"},
-     *     summary="Search products",
-     *     description="Search products by various fields",
-     *     operationId="searchProducts",
-     *     @OA\Parameter(
-     *         name="title",
-     *         in="query",
-     *         required=false,
-     *         @OA\Schema(type="string"),
-     *         description="Search by title"
-     *     ),
-     *     @OA\Parameter(
-     *         name="description",
-     *         in="query",
-     *         required=false,
-     *         @OA\Schema(type="string"),
-     *         description="Search by description"
-     *     ),
-     *     @OA\Parameter(
-     *         name="category_id",
-     *         in="query",
-     *         required=false,
-     *         @OA\Schema(type="integer"),
-     *         description="Filter by category ID"
-     *     ),
-     *     @OA\Parameter(
-     *         name="show_price",
-     *         in="query",
-     *         required=false,
-     *         @OA\Schema(type="boolean"),
-     *         description="Filter by show price status"
-     *     ),
-     *     @OA\Parameter(
-     *         name="version",
-     *         in="query",
-     *         required=false,
-     *         @OA\Schema(type="number"),
-     *         description="Filter by version"
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful operation",
-     *         @OA\JsonContent(ref="#/components/schemas/ProductCollection")
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Unauthenticated"
-     *     )
-     * )
-     */
-    public function search(Request $request): ProductCollection
-    {
-        $filters = $request->all();
-        $products = $this->service->searchByFields($filters);
-        return new ProductCollection($products);
-    }
-
-    /**
      * Restore a soft deleted product
      *
      * @OA\Post(
@@ -574,58 +444,17 @@ class ProductController extends Controller
         return ProductResource::collection($products);
     }
 
-    /**
-     * Toggle product status
-     *
-     * @OA\Post(
-     *     path="/api/v1/products/{id}/toggle-status",
-     *     tags={"Products"},
-     *     summary="Toggle product status",
-     *     description="Toggles the status of a product between active and inactive",
-     *     operationId="toggleProductStatus",
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         required=true,
-     *         @OA\Schema(type="integer", example=1),
-     *         description="The ID of the product to toggle status"
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Status toggled successfully",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="message", type="string", example="Status toggled successfully")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Product not found",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="error", type="string", example="Not found")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Unauthenticated"
-     *     )
-     * )
-     */
-    public function toggle_status($id)
-    {
-        $toggled = $this->service->toggle_status($id);
-
-        if (!$toggled) {
-            return response()->json(['error' => 'Not found'], 404);
-        }
-
-        return response()->json(['message' => 'Status toggled successfully']);
-    }
-
     public function find_by_slug(Request $request,$slug):ProductResource
     {
         $data = $this->service->getProductBySlug($slug);
         return new ProductResource($data);
+    }
+
+    public function updatePrices(Request $request)
+    {
+        $data = $request->all();
+        $this->service->updateProductPrices($data);
+
+        return response()->json(['success' => true]);
     }
 }

@@ -104,5 +104,26 @@ class Product extends Model
     {
         return "product '{$this->name}' was {$eventName} by user ID " . auth()->id();
     }
+    public function scopeSearch($query, $filters)
+    {
+        foreach ($filters ?? [] as $field => $value) {
+            switch ($field) {
+
+                case 'content':
+                    $query->where('title', 'like', "%{$value}%");
+                    break;
+
+                case 'category_id':
+                        $query->where('category_id', $value);
+                    break;
+
+                case 'status':
+                    $query->where('status', (int)$value);
+                    break;
+            }
+        }
+
+        return $query;
+    }
 
 }

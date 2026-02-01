@@ -7,9 +7,19 @@ use Modules\Product\App\Models\Product;
 
 class ProductRepository
 {
-    public function all(): \Illuminate\Database\Eloquent\Collection
+    public function getProducts(array $filters = [], $perPage = 15, $page = 1, $paginate = true)
     {
-        return Product::with('category')->get();
+        $query = Product::query();
+        if (isset($filters['with'])) {
+            $query->with([$filters['with']]);
+        }
+        if (!empty($filters)) {
+            $query->search($filters);
+        }
+
+        return $paginate
+            ? $query->paginate($perPage, ['*'], 'page', $page)
+            : $query->get();
     }
 
     public function getTrashedProducts(): \Illuminate\Database\Eloquent\Collection
@@ -57,66 +67,21 @@ class ProductRepository
         $product = Product::onlyTrashed()->findOrFail($id);
         $product->forceDelete();
     }
-
-    public function searchByFields(array $filters)
+    public function updatePrices(array $productsData)
     {
-        $query = Product::with('category');
+        foreach ($productsData as $item) {
+            $product = Product::find($item['product_id']);
+            if (!$product) continue;
 
-        foreach ($filters as $field => $value) {
-            if (empty($value)) continue;
+            $prices = $product->prices ?? [];
 
-            switch ($field) {
-                case 'title':
-                    $query->where('title', 'like', "%{$value}%");
-                    break;
-
-                case 'description':
-                    $query->where('description', 'like', "%{$value}%");
-                    break;
-
-                case 'product_code':
-                    $query->where('product_code', $value);
-                    break;
-
-                case 'slug':
-                    $query->where('slug', 'like', "%{$value}%");
-                    break;
-
-                case 'status':
-                    $query->where('status', $value);
-                    break;
-
-                case 'category_id':
-                    $query->where('category_id', $value);
-                    break;
-
-                case 'show_price':
-                    $query->where('show_price', $value);
-                    break;
-
-                case 'payment_type':
-                    $query->where('payment_type', $value);
-                    break;
-
-                case 'version':
-                    $query->where('version', $value);
-                    break;
-
-                case 'order':
-                    $query->where('order', $value);
-                    break;
-
-                case 'video_script':
-                    $query->where('video_script', 'like', "%{$value}%");
-                    break;
-
-                case 'image':
-                    $query->where('image', 'like', "%{$value}%");
-                    break;
+            foreach ($item['prices'] as $p) {
+                $prices[$p['zone_id']] = $p['price'];
             }
-        }
 
-        return $query->get();
+            $product->prices = $prices;
+            $product->save();
+        }
     }
 
     public function getNextProductCode()

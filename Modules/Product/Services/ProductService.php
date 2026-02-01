@@ -16,9 +16,12 @@ class ProductService
         $this->repo = $repo;
     }
 
-    public function getPaginated(int $perPage = 15): \Illuminate\Pagination\LengthAwarePaginator
+    public function getProducts(array $filters)
     {
-        return $this->repo->paginate($perPage);
+        $perPage = $filters['per_page'] ?? 15;
+        $page = $filters['page'] ?? 1;
+        $paginate = $filters['paginate'] ?? true;
+        return $this->repo->getProducts($filters, $perPage, $page, $paginate);
     }
 
     public function getAll(): \Illuminate\Database\Eloquent\Collection
@@ -144,5 +147,18 @@ class ProductService
     public function getProductBySlug($slug)
     {
         return $this->repo->getBySlug($slug);
+    }
+    public function updateProductPrices(array $productsData)
+    {
+        // مثال: اگر قیمت منفی بود حذف شود
+        foreach ($productsData as &$item) {
+            foreach ($item['prices'] as &$price) {
+                if ($price['price'] < 0) {
+                    $price['price'] = 0;
+                }
+            }
+        }
+
+        $this->repo->updatePrices($productsData);
     }
 }

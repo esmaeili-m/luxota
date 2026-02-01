@@ -372,4 +372,10 @@ class RoleController extends Controller
         return RoleResource::collection($roles);
     }
 
+    public function assignPermissions(Request $request,$id)
+    {
+        $this->service->assignPermissions($request->all(),$id);
+        return response()->json(['message' => 'Update successfully']);
+    }
+
 }

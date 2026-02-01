@@ -42,6 +42,7 @@ class UpdateCategoryRequest extends FormRequest
             ],
             'image' => 'nullable|file|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'order' => 'nullable|integer|min:1',
+            'status'=>'bool',
             'parent_id' => 'nullable|exists:categories,id',
         ];
     }

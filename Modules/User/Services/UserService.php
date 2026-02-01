@@ -45,6 +45,17 @@ class UserService
         return $this->repo->paginate($perPage);
     }
 
+    public function getUsers(array $params)
+    {
+        $filters = [
+            'status' => $params['status'] ?? null,
+            'name' => $params['name'] ?? null,
+        ];
+        $perPage = $params['per_page'] ?? 15;
+        $paginate = $params['paginate'] ?? true;
+        return $this->repo->getUsers($filters, $perPage, $paginate);
+    }
+
     public function getAll(): \Illuminate\Database\Eloquent\Collection
     {
         return $this->repo->all();

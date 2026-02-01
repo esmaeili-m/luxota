@@ -23,12 +23,10 @@ use Modules\User\Services\UserService;
 class CategoryController extends Controller
 {
     protected CategoryService $service;
-    protected UserService $userService;
 
-    public function __construct(CategoryService $service,UserService $userService)
+    public function __construct(CategoryService $service)
     {
         $this->service = $service;
-        $this->userService = $userService;
     }
 
     /**
@@ -72,17 +70,15 @@ class CategoryController extends Controller
     {
         $input = $request->only([
             'status',
-            'title',
-            'subtitle',
+            'content',
+            'with',
             'parent_id',
-            'per_page',
-            'paginate',
-            'sort_by',
-            'sort_direction'
         ]);
-        $input['paginate'] = $request->boolean('paginate');
-        $input['sort_by'] = $input['sort_by'] ?? 'id';
-        $input['sort_direction'] = $input['sort_direction'] ?? 'asc';
+
+        $input['paginate'] = $request->boolean('paginate', true);
+        $input['page'] = $request->input('page', 1);
+        $input['per_page'] = $request->input('per_page', 10);
+
         $categories = $this->service->getCategories($input);
         return CategoryResource::collection($categories);
     }
@@ -134,104 +130,6 @@ class CategoryController extends Controller
             return response()->json(['error' => 'Not found'], 404);
         }
 
-        return new CategoryResource($category);
-    }
-
-    /**
-     * Get a Category by ID with its children
-     *
-     * @OA\Get(
-     *     path="/api/v1/categories/{id}/with-children",
-     *     tags={"Categories"},
-     *     summary="Get category with its children",
-     *     description="Returns a category by ID along with its immediate child categories",
-     *     operationId="getCategoryWithChildren",
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         required=true,
-     *         description="The ID of the category to retrieve along with its children",
-     *         @OA\Schema(type="integer", example=1)
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful operation",
-     *         @OA\JsonContent(ref="#/components/schemas/Category")
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Category not found",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="error", type="string", example="Not found")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Unauthenticated",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="message", type="string", example="Unauthenticated.")
-     *         )
-     *     )
-     * )
-     */
-    public function showWithChildren($id): CategoryResource|\Illuminate\Http\JsonResponse
-    {
-        $category = $this->service->getById($id, ['children']);
-
-        if (!$category) {
-            return response()->json(['error' => 'Not found'], 404);
-        }
-
-        return new CategoryResource($category);
-    }
-
-    /**
-     * Get a category by ID with its parent
-     *
-     * @OA\Get(
-     *     path="/api/v1/categories/{id}/with-parent",
-     *     tags={"Categories"},
-     *     summary="Get category with its parent",
-     *     description="Returns a category by ID along with its parent category",
-     *     operationId="getCategoryWithParent",
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         required=true,
-     *         description="The ID of the category to retrieve along with its parent",
-     *         @OA\Schema(type="integer", example=1)
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful operation",
-     *         @OA\JsonContent(ref="#/components/schemas/Category")
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Category not found",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="error", type="string", example="Not found")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Unauthenticated",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="message", type="string", example="Unauthenticated.")
-     *         )
-     *     )
-     * )
-     */
-    public function showWithParent($id): CategoryResource|\Illuminate\Http\JsonResponse
-    {
-        $category = $this->service->getById($id, ['parent']);
-        if (!$category) {
-            return response()->json(['error' => 'Not found'], 404);
-        }
         return new CategoryResource($category);
     }
 
@@ -396,68 +294,6 @@ class CategoryController extends Controller
     }
 
     /**
-     * Search Categories
-     * @OA\Get(
-     *     path="/api/v1/categories/search",
-     *     tags={"Categories"},
-     *     summary="Search categories by filters",
-     *     description="Returns categories filtered by title, subtitle, slug, or status",
-     *     operationId="searchCategories",
-     *     @OA\Parameter(
-     *         name="title",
-     *         in="query",
-     *         description="Filter by category title (partial match)",
-     *         required=false,
-     *         @OA\Schema(type="string", example="php")
-     *     ),
-     *     @OA\Parameter(
-     *         name="subtitle",
-     *         in="query",
-     *         description="Filter by category subtitle (partial match)",
-     *         required=false,
-     *         @OA\Schema(type="string", example="tutorial")
-     *     ),
-     *     @OA\Parameter(
-     *         name="slug",
-     *         in="query",
-     *         description="Filter by category slug (partial match)",
-     *         required=false,
-     *         @OA\Schema(type="string", example="electronics")
-     *     ),
-     *     @OA\Parameter(
-     *         name="status",
-     *         in="query",
-     *         description="Filter by category status",
-     *         required=false,
-     *         @OA\Schema(type="string", example="active")
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Filtered categories list",
-     *         @OA\JsonContent(
-     *             type="array",
-     *             @OA\Items(ref="#/components/schemas/Category")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Unauthenticated",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="Unauthenticated.")
-     *         )
-     *     )
-     * )
-     */
-    public function search(Request $request): CategoryCollection
-    {
-        $filters = $request->only(['title', 'subtitle', 'slug', 'status']);
-
-        return new CategoryCollection(
-            $this->service->searchByFields($filters)
-        );
-    }
-
-    /**
      * Restore a deleted category
      * @OA\Patch(
      *     path="/api/v1/categories/{id}/restore",
@@ -547,48 +383,6 @@ class CategoryController extends Controller
     {
         $categories = $this->service->getTrashedCategories();
         return CategoryResource::collection($categories);
-    }
-
-    /**
-     * Get category with its children
-     * @OA\Get(
-     *     path="/api/v1/categories/{id}/children",
-     *     tags={"Categories"},
-     *     summary="Get a category and its children",
-     *     description="Returns the specified category and a list of its child categories",
-     *     operationId="getCategoryChildren",
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         description="ID of the parent category",
-     *         required=true,
-     *         @OA\Schema(type="integer", example=3)
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Category and children data",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="category", ref="#/components/schemas/Category"),
-     *             @OA\Property(
-     *                 property="children",
-     *                 type="array",
-     *                 @OA\Items(ref="#/components/schemas/Category")
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Category not found"
-     *     )
-     * )
-     */
-    public function category_children($id)
-    {
-        $data = [];
-        $data['category'] = $this->service->getById($id);
-        $data['children'] = $this->service->getChildrenCategory($id);
-        return response()->json($data);
     }
 
     public function find_by_slug($slug):CategoryWithProductsResource

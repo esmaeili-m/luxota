@@ -74,7 +74,18 @@ class UserRepository
     {
         return User::with(['role', 'zone', 'city', 'rank', 'referrer', 'branch', 'parent'])->paginate($perPage);
     }
-
+    public function getUsers(array $filters = [] , $perPage = 15, $paginate = false)
+    {
+        $query = User::query();
+        if (!empty($filters)) {
+            $query->search($filters);
+        }
+        if ($paginate) {
+            return $query->paginate($perPage);
+        } else {
+            return $query->get();
+        }
+    }
     public function find(int $id, array $with = [])
     {
         return User::with(['city.country','role','parent'])->findOrFail($id);

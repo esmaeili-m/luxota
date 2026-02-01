@@ -82,4 +82,10 @@ class RoleService
         $this->repo->forceDelete($id);
     }
 
+    public function assignPermissions($permissions,$roleId)
+    {
+        $role = $this->repo->find($roleId);
+        return $role->syncPermissions($permissions['permissions']);
+    }
+
 }

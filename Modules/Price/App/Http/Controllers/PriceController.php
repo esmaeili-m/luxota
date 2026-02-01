@@ -3,6 +3,7 @@
 namespace Modules\Price\App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -63,9 +64,13 @@ class PriceController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id): RedirectResponse
+    public function update(Request $request): JsonResponse
     {
-        //
+        $this->service->update($request->all());
+
+        return response()->json([
+            'success' => true
+        ]);
     }
 
     /**

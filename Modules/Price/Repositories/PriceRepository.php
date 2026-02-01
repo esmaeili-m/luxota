@@ -32,4 +32,16 @@ class PriceRepository
     {
         return $price->delete();
     }
+
+    public function update($rows)
+    {
+         Price::upsert(
+            $rows,
+            ['product_id', 'zone_id'],
+            ['price', 'updated_at']
+        );
+        return response()->json([
+            'success' => true
+        ]);
+    }
 }

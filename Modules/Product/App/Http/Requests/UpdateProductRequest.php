@@ -23,27 +23,36 @@ class UpdateProductRequest extends FormRequest
         $productId = $this->route('id');
 
         return [
-            'title' => 'required|array',
-            'title.en' => 'required|string|max:255',
-            'description' => 'required|array',
-            'description.en' => 'required|string',
-            'product_code' => 'nullable|integer|min:1',
-            'last_version_update_date' => 'nullable|date',
-            'version' => 'nullable|numeric|min:0',
-            'image' => 'nullable',
-            'video_script' => 'nullable|string',
+            'title' => 'sometimes|required|array',
+            'title.en' => 'sometimes|required|string|max:255',
+
+            'description' => 'sometimes|required|array',
+            'description.en' => 'sometimes|required|string',
+
+            'product_code' => 'sometimes|nullable|integer|min:1',
+            'last_version_update_date' => 'sometimes|nullable|date',
+            'version' => 'sometimes|nullable|numeric|min:0',
+
+            'image' => 'sometimes|nullable', // اگه فایل هست → image|mimes هم اضافه کن
+            'video_script' => 'sometimes|nullable|string',
+
             'slug' => [
+                'sometimes',
                 'nullable',
                 'string',
                 'max:255',
-                Rule::unique('products', 'slug')->ignore($productId)
+                Rule::unique('products', 'slug')->ignore($productId),
             ],
-            'order' => 'nullable|integer|min:1',
-            'show_price' => 'nullable|boolean',
-            'payment_type' => 'nullable|boolean',
-            'status' => 'nullable|boolean',
-            'category_id' => 'required|exists:categories,id',
+
+            'order' => 'sometimes|nullable|integer|min:1',
+
+            'show_price' => 'sometimes|nullable|boolean',
+            'payment_type' => 'sometimes|nullable|boolean',
+            'status' => 'sometimes|nullable|boolean',
+
+            'category_id' => 'sometimes|required|exists:categories,id',
         ];
+
     }
 
     /**

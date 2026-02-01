@@ -27,7 +27,10 @@ Route::prefix('v1')
         Route::get('support/tickets/{id}', [\Modules\Support\App\Http\Controllers\TicketController::class, 'get_ticket']);
 
         Route::Post('support/tickets', [\Modules\Support\App\Http\Controllers\TicketController::class, 'tickets']);
-
+        Route::get('support/tickets', [\Modules\Support\App\Http\Controllers\TicketController::class, 'get_tickets']);
+        Route::put('support/tickets/{id}', [\Modules\Support\App\Http\Controllers\TicketController::class, 'update']);
+        Route::get('support/ticket-count', [\Modules\Support\App\Http\Controllers\TicketController::class, 'ticket_count']);
+        Route::delete('support/{id}', [\Modules\Support\App\Http\Controllers\TicketController::class, 'destroy']);
 //        Route::post('roles', [\Modules\Support\App\Http\Controllers\TicketController::class, 'store'])
 //            ->name('roles.store')
 //            ->middleware('permission:role.create');

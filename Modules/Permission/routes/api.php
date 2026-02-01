@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use \Modules\Permission\App\Http\Controllers\PermissionController;
 
 /*
     |--------------------------------------------------------------------------
@@ -14,6 +15,16 @@ use Illuminate\Support\Facades\Route;
     |
 */
 
-Route::middleware(['auth:sanctum'])->prefix('v1')->name('api.')->group(function () {
-    Route::get('permission', fn (Request $request) => $request->user())->name('permission');
-});
+
+Route::prefix('v1/permissions')
+    ->name('api.v1.')
+    ->group(function () {
+
+
+        // ------------------------------
+        // Category resource routes
+        // ------------------------------
+        Route::get('/', [PermissionController::class, 'index']);
+        Route::get('/getGroupedPermissions', [PermissionController::class, 'getGroupedPermissions']);
+
+    });

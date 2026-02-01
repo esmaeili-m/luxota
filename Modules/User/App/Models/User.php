@@ -183,5 +183,27 @@ class User extends Authenticatable
     {
         return "User '{$this->name}' was {$eventName} by user ID " . auth()->id();
     }
+    public function scopeSearch($query, $fillters)
+    {
+
+        foreach ($fillters ?? [] as $filed){
+            if (!$filed) {
+                break;
+            }
+            switch ($filed) {
+                case 'name':
+                    $query->where('name', $filed);
+                    break;
+
+                case 'status':
+                    $query->where('status', $filed);
+                    break;
+
+            }
+        }
+
+        return $query;
+    }
+
 
 }

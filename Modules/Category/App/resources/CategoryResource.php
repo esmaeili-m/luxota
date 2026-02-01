@@ -44,7 +44,7 @@ class CategoryResource extends JsonResource
                 });
             }),
             'products' => $this->whenLoaded('products', function () {
-                return $this->children->map(function ($product) {
+                return $this->products->map(function ($product) {
                     return [
                         'id'          => $product->id,
                         'title'       => $product->title,
@@ -58,6 +58,13 @@ class CategoryResource extends JsonResource
                         'order'       => $product->order,
                         'show_price'  => $product->show_price,
                         'payment_type' => $product->payment_type,
+                        'prices' => $product->prices
+                            ? $product->prices->map(fn($p) => [
+                                'zone_id' => $p->zone_id,
+                                'price'   => $p->price
+                            ])
+                            : [],
+
                     ];
                 });
             }),
