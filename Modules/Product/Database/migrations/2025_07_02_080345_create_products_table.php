@@ -13,26 +13,39 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
+
             $table->json('title');
-            $table->foreignId('author_id')->constrained('users')->cascadeOnDelete()->cascadeOnUpdate();
             $table->json('description');
-            $table->bigInteger('product_code')->default(10);
-            $table->dateTime('last_version_update_date')->default(\Illuminate\Support\Facades\DB::raw('CURRENT_TIMESTAMP'));;
+
+            $table->foreignId('user_id')
+                ->constrained()
+                ->cascadeOnDelete()
+                ->cascadeOnUpdate();
+
+            $table->foreignId('category_id')
+                ->constrained()
+                ->cascadeOnDelete()
+                ->cascadeOnUpdate();
+
+            $table->unsignedBigInteger('product_code')->default(10);
+
+            $table->timestamp('last_version_update_date')->useCurrent();
+
             $table->float('version')->nullable();
             $table->text('image')->nullable();
             $table->text('video_script')->nullable();
+
             $table->string('slug');
             $table->integer('order')->default(1);
-            $table->boolean('show_price')->default(1);
-            $table->boolean('payment_type')->default(1);
-            $table->boolean('status')->default(1);
-            $table->foreignId('category_id')
-                ->constrained()
-                ->onUpdate('CASCADE')
-                ->onDelete('CASCADE');
+
+            $table->boolean('show_price')->default(true);
+            $table->boolean('payment_type')->default(true);
+            $table->boolean('status')->default(true);
+
             $table->softDeletes();
             $table->timestamps();
         });
+
     }
 
     /**

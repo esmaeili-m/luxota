@@ -3,6 +3,7 @@
 namespace Modules\Category\App\resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Modules\Product\App\resources\ProductResource;
 
 class CategoryResource extends JsonResource
 {
@@ -40,34 +41,13 @@ class CategoryResource extends JsonResource
                         'parent_id'   => $child->parent_id,
                         'status'      => $child->status,
                         'status_label'=> $child->status == 1 ? 'active' : 'inactive',
+                        'products' => $child->relationLoaded('products')
+                            ? ProductResource::collection($child->products)
+                            : null,
                     ];
                 });
             }),
-            'products' => $this->whenLoaded('products', function () {
-                return $this->products->map(function ($product) {
-                    return [
-                        'id'          => $product->id,
-                        'title'       => $product->title,
-                        'description' => $product->description,
-                        'product_code' => $product->product_code,
-                        'last_version_update_date' => $this->last_version_update_date?->format('Y-m-d H:i:s'),
-                        'version'     => $product->version,
-                        'image'       => $product->image,
-                        'video_script' => $product->video_script,
-                        'slug'        => $product->slug,
-                        'order'       => $product->order,
-                        'show_price'  => $product->show_price,
-                        'payment_type' => $product->payment_type,
-                        'prices' => $product->prices
-                            ? $product->prices->map(fn($p) => [
-                                'zone_id' => $p->zone_id,
-                                'price'   => $p->price
-                            ])
-                            : [],
 
-                    ];
-                });
-            }),
         ];
     }
 }

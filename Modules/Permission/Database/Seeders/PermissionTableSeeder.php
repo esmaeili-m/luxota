@@ -32,24 +32,16 @@ class PermissionTableSeeder extends Seeder
                 'guard_name' => 'api'
             ]);
         }
-
         $permissionModels = Permission::whereIn('name', $permissions)
             ->where('guard_name', 'api')
             ->get();
-
         $admin = Role::firstOrCreate([
             'name' => 'SuperAdmin',
             'guard_name' => 'api'
         ]);
-
         $admin->syncPermissions($permissionModels);
-
         $user = User::find(1);
-
-        // ← این خط را اضافه کن
-        $user->assignRole($admin);
-
+        $user->syncRoles([$admin]);
         $permissions = $user->getAllPermissions();
-        dd($permissions);
     }
 }

@@ -385,10 +385,9 @@ class CategoryController extends Controller
         return CategoryResource::collection($categories);
     }
 
-    public function find_by_slug($slug):CategoryWithProductsResource
+    public function find_by_slug($slug)
     {
-        $data = $this->service->getCategoryWithProducts($slug);
-        $user=$this->userService->getById(auth()->user()->id ?? 1);
-        return new CategoryWithProductsResource($data,$user);
+        $data = $this->service->getBySlug($slug);
+        return new CategoryResource($data);
     }
 }

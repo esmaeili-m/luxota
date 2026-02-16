@@ -17,7 +17,6 @@ return new class extends Migration
             $table->foreignId('invoice_id')->nullable()->constrained('invoices')->nullOnDelete();
             $table->decimal('debit', 15, 2)->default(0);
             $table->decimal('credit', 15, 2)->default(0);
-            $table->decimal('credit', 15, 2)->default(0);
             $table->bigInteger('method');
             $table->foreignId('created_by')->nullable()->constrained('users');
             $table->foreignId('voucher_id')->nullable()->constrained('vouchers')->nullOnDelete();

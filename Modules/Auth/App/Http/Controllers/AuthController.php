@@ -24,17 +24,15 @@ class AuthController extends Controller
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
         auth()->login($user);
-//        $token = $user->createToken('api-token')->plainTextToken;
         $user->load('roles', 'permissions');
 
         return response()->json([
             'message' => 'Logged in',
-//            'token' => $token,
             'user' => [
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
-                'roles' => $user->getRoleNames(),
+                'role' => optional($user->roles->first())->name,
                 'permissions' =>$user->getAllPermissions()->pluck('name')
             ]
         ]);

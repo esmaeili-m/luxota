@@ -67,7 +67,7 @@ class TicketService
           'last_reply_at' => now(),
         ];
         if (!empty($data['status'])){
-            $data_time['status']='watting customer res';
+            $data_time['status']=3;
         }
         $this->repo->update($ticketId,$data_time);
 

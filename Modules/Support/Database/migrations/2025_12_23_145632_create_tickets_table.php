@@ -21,7 +21,7 @@ return new class extends Migration
 
             $table->string('subject');
             $table->bigInteger('code');
-            $table->string('status')->default('open');
+            $table->integer('status')->default(1);
             $table->string('priority')->default('normal');
 
             $table->timestamp('last_reply_at')->nullable();

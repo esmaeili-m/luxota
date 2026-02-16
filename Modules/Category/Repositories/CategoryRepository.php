@@ -82,7 +82,7 @@ class CategoryRepository
 
     public function getBySlug($slug)
     {
-        return Category::where('slug',$slug)->where('status',1)->with(['children' => function($childern){
+        return Category::where('slug',$slug)->where('status',1)->with(['children.products' => function($childern){
             $childern->where('status',1);
         }])->first();
     }

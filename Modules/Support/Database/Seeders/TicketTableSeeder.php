@@ -33,7 +33,7 @@ class TicketTableSeeder extends Seeder
                 'subject' => $data['title'],
                 'code' => $data['code'],
                 'last_reply_at' => null,
-                'status' => $status[$data['is_closed']] ?? 'open',
+                'status' => $data['is_closed'] ?? 1,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ];

@@ -10,6 +10,14 @@ class TicketResource extends JsonResource
     /**
      * Transform the resource into an array.
      */
+    protected $statuses =[
+      'UNKNOW',
+      'OPEN',
+      'WATTING REVIEW',
+      'WATTING CUSTOMER RES',
+      'DEV PROGRESS',
+       'SOLVED'
+    ];
     public function toArray($request): array
     {
         return [
@@ -59,6 +67,7 @@ class TicketResource extends JsonResource
                 : Carbon::parse($this->last_reply_at)->diffForHumans(),
             'date' => Carbon::parse($this->created_at)->diffForHumans(),
             'status' => $this->status,
+            'status_label' => $this->statuses[$this->status],
             'created_at' => $this->created_at,
             'opened_at' => Carbon::parse($this->created_at)->diffForHumans()
         ];

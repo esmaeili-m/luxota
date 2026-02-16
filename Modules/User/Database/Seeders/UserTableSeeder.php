@@ -17,7 +17,7 @@ class UserTableSeeder extends Seeder
         User::Truncate();
         User::create([
             'name' => 'Mahdi Esmaeili',
-            'email' => 'mahdi@luxota.com',
+            'email' => 'mahdi@gmail.com',
             'password' => bcrypt('mahdicfc'),
             'phone' => '09193544391',
             'description' => 'System Administrator',

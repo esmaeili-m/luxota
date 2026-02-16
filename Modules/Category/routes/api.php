@@ -32,7 +32,7 @@ Route::prefix('v1/categories')
         Route::post('/{id}/restore', [CategoryController::class, 'restore'])
             ->middleware('permission:category.restore');
 
-        Route::get('categories/findBySlug/{slug}', [CategoryController::class, 'find_by_slug'])
+        Route::get('/findBySlug/{slug}', [CategoryController::class, 'find_by_slug'])
             ->middleware('permission:category.index');
 
 

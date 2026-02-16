@@ -17,5 +17,6 @@
     "AccountingFinance": true,
     "Currency": true,
     "Support": true,
-    "Notification": true
+    "Notification": true,
+    "Planner": true
 }

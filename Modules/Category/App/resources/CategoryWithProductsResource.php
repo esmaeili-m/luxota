@@ -13,7 +13,7 @@ class CategoryWithProductsResource extends JsonResource
     public function toArray($request): array
     {
         return [
-            'id'    => $this['category']->id,
+            'id'    => $this->id,
             'title'  => $this['category']->title,
             'subtitle'  => $this['category']->subtitle,
             'slug'  => $this['category']->slug,
