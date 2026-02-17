@@ -4,7 +4,7 @@ namespace Modules\Planner\App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class CreateTaskRequest extends FormRequest
+class UpdateTaskRequest extends FormRequest
 {
     /**
      * Get the validation rules that apply to the request.
@@ -12,16 +12,17 @@ class CreateTaskRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'board_id' => ['required','exists:boards,id'],
-            'column_id' => ['required','exists:columns,id'],
+            'board_id' => ['sometimes','exists:boards,id'],
+            'column_id' => ['sometimes','exists:columns,id'],
             'sprint_id' => ['nullable','exists:sprints,id'],
             'ticket_id' => ['nullable','exists:tickets,id'],
-            'title_fa' => ['required','string','max:255'],
+
+            'title_fa' => ['sometimes','string','max:255'],
             'title_en' => ['nullable','string','max:255'],
             'description' => ['nullable','string'],
 
-            'type' => ['required','in:task,story'],
-            'priority' => ['required','in:low,high,critical'],
+            'type' => ['sometimes','in:task,story'],
+            'priority' => ['sometimes','in:low,high,critical'],
             'task_category' => ['nullable','in:bug,improvement,task,change_request'],
             'urgent' => ['boolean'],
 
@@ -34,7 +35,7 @@ class CreateTaskRequest extends FormRequest
             'created_by' => ['nullable','exists:users,id'],
             'assigned_to' => ['nullable','exists:users,id'],
 
-            'team_id' => ['required','exists:teams,id'],
+            'team_id' => ['sometimes','exists:teams,id'],
 
             'due_date' => ['nullable','date'],
 

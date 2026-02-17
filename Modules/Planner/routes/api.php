@@ -88,6 +88,9 @@ Route::prefix('v1/tasks')
 
         Route::Put('/{id}', [TaskController::class, 'update'])
             ->middleware('permission:zone.index');
+
+        Route::delete('/{id}', [TaskController::class, 'destroy'])
+            ->middleware('permission:zone.index');
     });
 
 Route::prefix('v1/teams')

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('sprint_id')->nullable();
             $table->unsignedBigInteger('ticket_id')->nullable();
 
-            $table->string('task_key')->unique();  // شناسه انسانی مثل DEV-102
+            $table->string('task_key')->unique()->nullable();  // شناسه انسانی مثل DEV-102
             $table->string('task_code')->unique(); // کد داخلی مثل TS10000
 
             $table->string('title_fa');
