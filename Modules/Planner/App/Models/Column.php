@@ -15,6 +15,10 @@ class Column extends Model
      */
     protected $guarded = [];
 
+    public function tasks()
+    {
+        return $this->hasMany(Task::class);
+    }
     protected static function newFactory(): ColumnFactory
     {
         //return ColumnFactory::new();

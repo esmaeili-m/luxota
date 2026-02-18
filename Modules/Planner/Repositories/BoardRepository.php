@@ -25,7 +25,7 @@ class BoardRepository
         return Board::create($data);
     }
 
-    public function find(int $id, array $with = ['columns'])
+    public function find(int $id, array $with = ['columns.tasks'])
     {
         return Board::with($with)->findOrFail($id);
     }
