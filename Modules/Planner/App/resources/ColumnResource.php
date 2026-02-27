@@ -22,6 +22,9 @@ class ColumnResource extends JsonResource
             'is_end'    => $this->is_end,
             'status'    => $this->status,
 
+            'rule' => new ColumnRuleResource(
+                $this->whenLoaded('rule')
+            ),
             'tasks' => TaskResource::collection(
                 $this->whenLoaded('tasks')
             ),

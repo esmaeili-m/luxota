@@ -40,6 +40,8 @@ return new class extends Migration
             $table->unsignedBigInteger('created_by');
             $table->unsignedBigInteger('assigned_to')->nullable(); // می‌تونه pivot team هم باشه
             $table->date('due_date')->nullable();
+            $table->bigInteger('total_tracked_minutes ')->default(0);
+            $table->bigInteger('order ')->default(1);
 
             $table->boolean('status')->default(true);
             $table->timestamps();

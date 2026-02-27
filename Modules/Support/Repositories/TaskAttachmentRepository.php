@@ -19,4 +19,12 @@ class TaskAttachmentRepository
     {
         return TaskAttachment::where('task_id', $taskId)->get();
     }
+    public function find(int $id)
+    {
+        return TaskAttachment::find($id);
+    }
+    public function update($attachment, $data)
+    {
+        return $attachment->update($data);
+    }
 }

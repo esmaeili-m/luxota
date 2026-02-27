@@ -72,4 +72,25 @@ class TaskController extends Controller
         }
         return response()->json(['message' => 'Deleted successfully']);
     }
+
+    public function move(Request $request,$id)
+    {
+        $task = $this->service->move($id, $request->direction);
+        if (!$task) {
+            return response()->json(['error' => 'Not found'], 404);
+        }
+        return new TaskResource($task);
+    }
+
+    public function show($id)
+    {
+        $task= $this->service->find($id);
+        return new TaskResource($task);
+    }
+
+    public function showByCode($code,Request $request)
+    {
+        $task=$this->service->getByCode($code,$request['with'] ?? []);
+        return new TaskResource($task);
+    }
 }

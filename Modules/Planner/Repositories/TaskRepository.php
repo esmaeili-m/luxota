@@ -32,7 +32,18 @@ class TaskRepository
     }
     public function find($id): ?Task
     {
-        return Task::find($id);
+        return Task::with([
+            'logs.user',
+            'logs.fromBoard',
+            'logs.toBoard',
+            'logs.fromColumn',
+            'logs.toColumn',
+        ])->findOrFail($id);
+    }
+
+    public function getByCode($code,$with=[])
+    {
+        return Task::where('task_code',$code)->with($with)->first();
     }
     public function getMaxCode()
     {

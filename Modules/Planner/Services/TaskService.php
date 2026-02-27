@@ -5,7 +5,10 @@ namespace Modules\Planner\Services;
 use App\Services\Uploader;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Modules\Planner\App\Models\Task;
 use Modules\Planner\Repositories\BoardRepository;
+use Modules\Planner\Repositories\ColumnRepository;
+use Modules\Planner\Repositories\TaskLogRepository;
 use Modules\Planner\Repositories\TaskRepository;
 use Illuminate\Validation\ValidationException;
 use Modules\Support\Repositories\TaskAttachmentRepository;
@@ -13,29 +16,33 @@ use Modules\Support\Repositories\TaskAttachmentRepository;
 class TaskService
 {
     protected TaskRepository $repo;
-    protected BoardRepository $boardRepository;
+    protected BoardRepository $boardRepositorysitory;
     protected TaskRepository $taskRepository;
     protected TaskAttachmentRepository $taskAttachmentRepository;
+    protected TaskLogService $taskLogService;
+    protected ColumnRepository $columnRepo;
 
-    public function __construct(TaskRepository $repo,BoardRepository $boardRepository,TaskRepository $taskRepository,TaskAttachmentRepository $taskAttachmentRepository)
+    public function __construct(TaskRepository $repo,ColumnRepository $columnRepo,BoardRepository $boardRepositorysitory,TaskRepository $taskRepository,TaskAttachmentRepository $taskAttachmentRepository,TaskLogService $taskLogService)
     {
         $this->repo = $repo;
-        $this->boardRepository = $boardRepository;
+        $this->boardRepositorysitory = $boardRepositorysitory;
+        $this->taskLogService = $taskLogService;
         $this->taskRepository = $taskRepository;
         $this->taskAttachmentRepository = $taskAttachmentRepository;
+        $this->columnRepo = $columnRepo;
     }
     public function getTasks(array $filters)
     {
         $perPage = $filters['per_page'] ?? 15;
         $page = $filters['page'] ?? 1;
         $paginate = $filters['paginate'] ?? true;
-
         $allowedWith = [
             'board',
             'column',
             'sprint',
             'team',
             'ticket',
+            'tags',
             'creator',
             'creator.role',
             'assignee',
@@ -74,7 +81,7 @@ class TaskService
 
             $files=$data['attachments'] ?? [];
             $titles=$data['attachments_titles'] ?? [];
-            $board = $this->boardRepository->find($data['board_id']);
+            $board = $this->boardRepositorysitory->find($data['board_id']);
             if (!$board) {
                 throw ValidationException::withMessages(['board_id' => 'Board not found.']);
             }
@@ -106,13 +113,11 @@ class TaskService
                 'created_by'      => Auth::id(),
             ];
 
-            // --- ایجاد Task از طریق Repository ---
             $task = $this->taskRepository->create($taskData);
 
-            // --- تولید و آپدیت task_key ---
             $taskKey = $this->generateTaskKey($board->key, $task->id);
             $task = $this->taskRepository->updateTaskKey($task, $taskKey);
-
+            $task->tags()->sync($data['tags']);
             // --- ذخیره Attachments ---
             foreach ($files ?? [] as $index => $file) {
                 $title = $titles[$index] ?? $file->getClientOriginalName();
@@ -128,7 +133,7 @@ class TaskService
                     'uploaded_by'=> Auth::id(),
                 ]);
             }
-
+            $this->taskLogService->createTaskLog($task, 'created');
             return $task;
         });
     }
@@ -142,7 +147,7 @@ class TaskService
                 throw ValidationException::withMessages(['task_id' => 'Task not found.']);
             }
 
-            $board = $this->boardRepository->find($data['board_id'] ?? $task->board_id);
+            $board = $this->boardRepositorysitory->find($data['board_id'] ?? $task->board_id);
             if (!$board) {
                 throw ValidationException::withMessages(['board_id' => 'Board not found.']);
             }
@@ -173,14 +178,26 @@ class TaskService
                 'team_id'         => $data['team_id'] ?? $task->team_id,
                 'status'          => $data['status'] ?? $task->status,
             ];
+            $oldBoard  = $task->board;
+            $oldColumn = $task->column;
 
+            $newBoardId  = $taskData['board_id'];
+            $newColumnId = $taskData['column_id'];
+            $boardChanged  = $oldBoard->id  != $newBoardId;
+            $columnChanged = $oldColumn->id != $newColumnId;
             $task = $this->taskRepository->update($task, $taskData);
-
-            // --- مدیریت Attachments ---
+            if ($boardChanged || $columnChanged) {
+                $this->taskLogService->moveTaskLog(
+                    $task,
+                    $oldBoard,
+                    $oldColumn
+                );
+            }
+            $task->tags()->sync($data['tags']);
 
             $files = $data['attachments'] ?? [];
             $titles = $data['attachments_titles'] ?? [];
-            $deletedIds = $data['deleted_attachments'] ?? []; // برای فایل‌هایی که کاربر حذف کرده
+            $deletedIds = $data['attachments_deleted'] ?? [];
             $titlesUpdate = $data['attachments_titles_update'] ?? [];
 
             foreach ($titlesUpdate as $id => $title) {
@@ -214,6 +231,45 @@ class TaskService
         });
     }
 
+    public function find($id)
+    {
+        return $this->repo->find($id);
+    }
+
+    public function getByCode($code,$with=[])
+    {
+        $allowedWith = [
+            'board',
+            'column',
+            'userTimes',
+            'tags',
+            'sprint',
+            'comments.user',
+            'comments.replies',
+            'team',
+            'team.users',
+            'ticket',
+            'ticket.user',
+            'creator',
+            'creator.role',
+            'assignee',
+            'assignee.role',
+            'attachments',
+            'parentTask',
+            'children',
+        ];
+        if (!empty($with)) {
+
+            $requested = collect(explode(',', $with))
+                ->map(fn($item) => trim($item))
+                ->filter()
+                ->toArray();
+
+            $with = array_values(array_intersect($requested, $allowedWith));
+        }
+
+        return $this->repo->getByCode($code,$with);
+    }
     public function delete($id)
     {
         $task = $this->repo->find($id);
@@ -221,6 +277,49 @@ class TaskService
             return false;
         }
         return $this->repo->delete($task);
+    }
+
+    public function move(int $taskId, string $direction)
+    {
+        $task = $this->taskRepository->find($taskId);
+        if (!$task) {
+            return response()->json(['error' => 'Not found'], 404);
+        }
+        $oldBoardId = $task->board_id;
+        $oldColumnId = $task->column_id;
+
+        if ($direction === 'forward') {
+            $nextColumn = $this->columnRepo->getNextColumn($task);
+
+            if ($nextColumn) {
+                $newBoardId = $nextColumn->board_id;
+                $newColumnId = $nextColumn->id;
+            } else {
+                $nextBoard = $this->boardRepository->getNextBoard($task->board_id);
+                if (!$nextBoard) return $task; // برد بعدی وجود ندارد
+                $firstColumn = $this->columnRepo->getFirstColumn($nextBoard);
+                $newBoardId = $nextBoard->id;
+                $newColumnId = $firstColumn->id;
+            }
+        } elseif ($direction === 'backward') {
+            $prevColumn = $this->columnRepo->getPreviousColumn($task);
+
+            if ($prevColumn) {
+                $newBoardId = $prevColumn->board_id;
+                $newColumnId = $prevColumn->id;
+            } else {
+                $prevBoard = $this->boardRepository->getPreviousBoard($task->board_id);
+                if (!$prevBoard) return $task; // برد قبلی وجود ندارد
+                $lastColumn = $this->columnRepo->getLastColumn($prevBoard);
+                $newBoardId = $prevBoard->id;
+                $newColumnId = $lastColumn->id;
+            }
+        } else {
+            throw new \InvalidArgumentException("Direction must be 'forward' or 'backward'");
+        }
+        $this->update($task->id,['border_id'=>$newBoardId,'column_id'=>$newColumnId]);
+
+        return $task;
     }
     /**
      * تولید task_key انسانی مثل DEV-102

@@ -8,6 +8,9 @@ use Modules\Planner\App\Http\Controllers\BoardController;
 use Modules\Planner\App\Http\Controllers\ColumnController;
 use Modules\Planner\App\Http\Controllers\TaskController;
 use Modules\Planner\App\Http\Controllers\TeamController;
+use Modules\Planner\App\Http\Controllers\TaskLogController;
+use Modules\Planner\App\Http\Controllers\TimeEstimateController;
+use Modules\Planner\App\Http\Controllers\CommentController;
 /*
     |--------------------------------------------------------------------------
     | API Routes
@@ -86,10 +89,31 @@ Route::prefix('v1/tasks')
         Route::Post('/', [TaskController::class, 'store'])
             ->middleware('permission:zone.index');
 
-        Route::Put('/{id}', [TaskController::class, 'update'])
+        Route::Post('/{id}/move', [TaskController::class, 'move'])
+            ->middleware('permission:zone.index');
+
+        Route::put('/{id}', [TaskController::class, 'update'])
+            ->middleware('permission:zone.index');
+
+        Route::get('/code/{id}', [TaskController::class, 'showByCode'])
             ->middleware('permission:zone.index');
 
         Route::delete('/{id}', [TaskController::class, 'destroy'])
+            ->middleware('permission:zone.index');
+    });
+
+Route::prefix('v1/time-estimate')
+    ->name('api.v1.')
+    ->group(function () {
+        Route::get('/', [TimeEstimateController::class, 'index'])
+            ->middleware('permission:zone.index');
+
+        Route::get('/{id}', [TimeEstimateController::class, 'show'])
+            ->middleware('permission:zone.index');
+
+        Route::post('/{task}/time', [TimeEstimateController::class, 'store']);
+
+        Route::Put('/{id}', [TimeEstimateController::class, 'update'])
             ->middleware('permission:zone.index');
     });
 
@@ -105,5 +129,36 @@ Route::prefix('v1/teams')
             ->middleware('permission:zone.index');
 
         Route::Put('/{id}', [TeamController::class, 'update'])
+            ->middleware('permission:zone.index');
+    });
+
+Route::prefix('v1/task-logs')
+    ->name('api.v1.')
+    ->group(function () {
+        Route::get('/', [TaskLogController::class, 'index'])
+            ->middleware('permission:zone.index');
+        Route::get('/{id}', [TaskLogController::class, 'show'])
+            ->middleware('permission:zone.index');
+
+        Route::Post('/', [TaskLogController::class, 'store'])
+            ->middleware('permission:zone.index');
+
+        Route::Put('/{id}', [TaskLogController::class, 'update'])
+            ->middleware('permission:zone.index');
+    });
+
+Route::prefix('v1/task-comments')
+    ->name('api.v1.')
+    ->group(function () {
+        Route::get('/', [CommentController::class, 'index'])
+            ->middleware('permission:zone.index');
+
+        Route::get('/{id}', [CommentController::class, 'show'])
+            ->middleware('permission:zone.index');
+
+        Route::Post('/', [CommentController::class, 'store'])
+            ->middleware('permission:zone.index');
+
+        Route::Put('/{id}', [CommentController::class, 'update'])
             ->middleware('permission:zone.index');
     });

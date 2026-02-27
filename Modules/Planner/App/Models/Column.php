@@ -19,6 +19,11 @@ class Column extends Model
     {
         return $this->hasMany(Task::class);
     }
+
+    public function rule()
+    {
+        return $this->hasOne(ColumnRule::class);
+    }
     protected static function newFactory(): ColumnFactory
     {
         //return ColumnFactory::new();

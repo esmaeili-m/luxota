@@ -35,11 +35,12 @@ class TaskResource extends JsonResource
             // --- Flags ---
             'urgent' => $this->urgent,
             'status' => $this->status,
+            'order' => $this->order,
 
             // --- Dates ---
             'due_date' => $this->due_date,
             'created_at' => $this->created_at?->toDateTimeString(),
-
+            'created_ago' => $this->created_at?->diffForHumans(),
             // --- Computed ---
             'is_overdue' => $this->due_date
                 ? now()->gt($this->due_date)
@@ -62,6 +63,12 @@ class TaskResource extends JsonResource
                 $this->whenLoaded('team')
             ),
 
+            'logs' => TaskLogResource::collection(
+                $this->whenLoaded('logs')
+            ),
+            'comments' => CommentResource::collection(
+                $this->whenLoaded('comments')
+            ),
             'tickets' => new TicketResource(
                 $this->whenLoaded('tickets')
             ),
@@ -73,14 +80,10 @@ class TaskResource extends JsonResource
                     'role' => $this->creator->role?->name,
                 ];
             }),
-            'ticket' => $this->whenLoaded('ticket', function () {
-                return [
-                    'id' => $this->ticket->id,
-                    'code' => 'CR'.$this->ticket->code,
-                    'subject' => $this->ticket->subject,
+            'ticket' => new TicketResource(
+                $this->whenLoaded('ticket')
+            ),
 
-                ];
-            }),
 
             'assignee' => $this->whenLoaded('assignee', function () {
                 return [
@@ -89,7 +92,12 @@ class TaskResource extends JsonResource
                     'role' => $this->assignee->role?->name,
                 ];
             }),
-
+            'user_times' => UserTimeResource::collection(
+                $this->whenLoaded('userTimes')
+            ),
+            'tags' => TagResource::collection(
+                $this->whenLoaded('tags')
+            ),
 
             'parent_task' => new TaskResource(
                 $this->whenLoaded('parentTask')

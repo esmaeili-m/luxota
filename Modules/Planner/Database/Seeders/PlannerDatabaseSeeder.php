@@ -12,10 +12,11 @@ class PlannerDatabaseSeeder extends Seeder
     public function run(): void
     {
          $this->call([
-             TagTableSeeder::class,
-             BoardTableSeeder::class,
-             ColumnTableSeeder::class,
-             TeamTableSeeder::class,
+//             TagTableSeeder::class,
+//             BoardTableSeeder::class,
+//             ColumnTableSeeder::class,
+//             TeamTableSeeder::class,
+         ColumnRulesTableSeeder::class
          ]);
     }
 }

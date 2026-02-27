@@ -53,6 +53,10 @@ class Task extends Model
     {
         return $this->belongsTo(Team::class);
     }
+    public function tags()
+    {
+        return $this->belongsToMany(Tag::class);
+    }
 
     public function creator()
     {
@@ -64,6 +68,19 @@ class Task extends Model
         return $this->belongsTo(User::class, 'assigned_to');
     }
 
+    public function logs()
+    {
+        return $this->hasMany(TaskLog::class);
+    }
+
+    public function userTimes()
+    {
+        return $this->hasMany(TimeEstimate::class);
+    }
+    public function comments()
+    {
+        return $this->hasMany(Comment::class)->whereNull('parent_id');
+    }
     /*
     |--------------------------------------------------------------------------
     | Self Relation (Parent / Children)

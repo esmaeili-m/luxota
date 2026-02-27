@@ -29,4 +29,17 @@ class BoardRepository
     {
         return Board::with($with)->findOrFail($id);
     }
+    public function getNextBoard($currentBoardId)
+    {
+        return Board::where('id', '>', $currentBoardId)
+            ->orderBy('id')
+            ->first();
+    }
+
+    public function getPreviousBoard($currentBoardId)
+    {
+        return Board::where('id', '<', $currentBoardId)
+            ->orderByDesc('id')
+            ->first();
+    }
 }

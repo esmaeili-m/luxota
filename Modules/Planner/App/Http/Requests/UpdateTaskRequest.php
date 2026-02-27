@@ -16,7 +16,8 @@ class UpdateTaskRequest extends FormRequest
             'column_id' => ['sometimes','exists:columns,id'],
             'sprint_id' => ['nullable','exists:sprints,id'],
             'ticket_id' => ['nullable','exists:tickets,id'],
-
+            'tags' => ['nullable', 'array'],
+            'tags.*' => ['integer', 'exists:tags,id'],
             'title_fa' => ['sometimes','string','max:255'],
             'title_en' => ['nullable','string','max:255'],
             'description' => ['nullable','string'],
@@ -44,6 +45,8 @@ class UpdateTaskRequest extends FormRequest
             'attachments' => ['nullable','array'],
             'attachments.*' => ['file','max:5120'], // حداکثر 5 مگابایت
             'attachments_titles' => ['nullable','array'],
+            'attachments_deleted' => ['nullable','array'],
+            'attachments_titles_update' => ['nullable','array'],
             'attachments_titles.*' => ['required_with:attachments.*','string','max:255'],
         ];
     }

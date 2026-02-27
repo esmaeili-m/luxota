@@ -15,6 +15,8 @@ class CreateTaskRequest extends FormRequest
             'board_id' => ['required','exists:boards,id'],
             'column_id' => ['required','exists:columns,id'],
             'sprint_id' => ['nullable','exists:sprints,id'],
+            'tags' => ['nullable', 'array'],
+            'tags.*' => ['integer', 'exists:tags,id'],
             'ticket_id' => ['nullable','exists:tickets,id'],
             'title_fa' => ['required','string','max:255'],
             'title_en' => ['nullable','string','max:255'],
